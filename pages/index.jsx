@@ -1,9 +1,9 @@
 import Head from 'next/head'
-import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
+
 
 const style = css`
   ul{
@@ -19,8 +19,8 @@ const style = css`
     margin-right: 1em;
   }
 `
-
 export default function Home() {
+
   return (
     <>
       <Head>
@@ -37,6 +37,8 @@ export default function Home() {
             <li><a href='./signUp'><Button>sign up</Button></a></li>
           </ul>
         </Container>
+
+        
       </main>
     </>
   )

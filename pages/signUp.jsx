@@ -1,7 +1,6 @@
 import { Container } from "@/components/Container";
 import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
-import styles from '@/styles/Home.module.css'
 import { Button } from "@/components/Button";
 import { useState } from "react";
 const style = css`
@@ -46,14 +45,15 @@ export default function signUpPage() {
     const [notice, setNotice] = useState("");
 
     const { getDocs, addDoc, collection, query, onSnapshot, where, getCountFromServer } = require("firebase/firestore");
-    const { db } = require("./firebaseSetup")
+    const { db } = require("./api/firebaseSetup")
     function handleClick() {
         console.log('increment like count');
       }
     async function signUp () {
         const q = query(collection(db, "users"), where("username", "==", u_username));
         const isValid = await getCountFromServer(q);
-        if(!isValid){
+        console.log(isValid.data().count)
+        if(isValid.data().count == 0){
           try {
             const docRef = await addDoc(collection(db, "users"), {
               email: u_email,

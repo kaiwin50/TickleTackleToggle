@@ -1,10 +1,10 @@
 import { Container } from "@/components/Container";
 import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
-import styles from '@/styles/Home.module.css'
 import { Button } from "@/components/Button";
 import { useState } from "react";
 import { useRouter } from "next/router";
+
 const style = css`
     body{
         display: flex;
@@ -44,27 +44,33 @@ export default function signUpPage() {
     const [u_username, setUsername] = useState("");
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
-    const { getDocs, collection, query, where, updateDoc, setDoc, writeBatch } = require("firebase/firestore");
-    const { db } = require("./firebaseSetup");
+    const { getDocs, collection, query, where, doc, setDoc, updateDoc } = require("firebase/firestore");
+    const { db } = require("./api/firebaseSetup");
     const router = useRouter();
     async function signIn () {
         const q = query(collection(db, "users"), where("username", "==", u_username));
         const isExist = await getDocs(q);
         console.log(q);
-        if (isExist != undefined){
-            const userRef = isExist.docs[0];
+        try{
+            console.log(isExist.docs)
             const userID = isExist.docs[0].id;
-            const doc = isExist.docs[0].data();
+            const userDoc = isExist.docs[0].data();
             console.log(doc);
-            if(u_password == doc.password){
+            if(u_password == userDoc.password){
                 console.log("successful login to ", userID)
-                const local = `./home/${ userID }_${ doc.username }`
+                await updateDoc(doc(collection(db, "users"), userID), {
+                    status : "online"
+                });
+                const local = `./home/${ userID }`
                 router.push(local)
             }
             else{
-                setNotice("username or password is incorrect.");
-                console.error("username or password is incorrect.");
+                throw "wrong password"
             }
+        }
+        catch(e){
+            setNotice("username or password is incorrect.");
+            console.error("username or password is incorrect. :", e)
         }
         
     }
