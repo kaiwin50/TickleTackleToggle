@@ -53,7 +53,7 @@ export default function Home() {
   
   async function socketInitializer (){
     await fetch('../api/socket');
-    socket = io()
+    socket = io('https://singular-starburst-49373c.netlify.app')
     
     socket.on('receive-message', data => {
       setAllMessages((pre) => [...pre, data]);
