@@ -53,14 +53,15 @@ export default function Home() {
   
   async function socketInitializer (){
     await fetch('../api/socket');
-    // socket = io()
-    socket = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
+    socket = io('singular-starburst-49373c.netlify.app')
+    // socket = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
     // socketT = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
     // socketT2 = io('http://localhost:3000')
     //https://singular-starburst-49373c.netlify.app
     socket.on('receive-message', data => {
       setAllMessages((pre) => [...pre, data]);
       console.log(data)
+
     })
   }
   function handleSubmit(e) {
