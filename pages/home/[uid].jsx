@@ -53,8 +53,11 @@ export default function Home() {
   
   async function socketInitializer (){
     await fetch('../api/socket');
-    socket = io('https://singular-starburst-49373c.netlify.app')
-    
+    // socket = io()
+    socket = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
+    // socketT = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
+    // socketT2 = io('http://localhost:3000')
+    //https://singular-starburst-49373c.netlify.app
     socket.on('receive-message', data => {
       setAllMessages((pre) => [...pre, data]);
       console.log(data)
@@ -64,7 +67,7 @@ export default function Home() {
     e.preventDefault();
 
     console.log("emitted");
-
+    console.log(socket)
     socket.emit("send-message", { username, msg });
     setMsg("");
   }
@@ -85,7 +88,8 @@ export default function Home() {
           {/* <Container width="80%"> { allMessages }</Container> */}
           <Container width="80%"> { allMessages.map(({username, msg}, index) => (<div key={index}>{username}: {msg}</div>))}</Container>
           <form onSubmit={ handleSubmit }>
-            <input type="text" onChange={ (e)=>( setMsg(e.target.value) ) } />
+            {/* <input type="text" value={ msg } /> */}
+            <input type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
           </form>
         </Container>
       </main>
