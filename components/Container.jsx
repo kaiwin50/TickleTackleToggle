@@ -19,4 +19,4 @@ const Container = styled(Box)`
   position: relative;
 `
 
-export { Container }
+export { Container, Box }

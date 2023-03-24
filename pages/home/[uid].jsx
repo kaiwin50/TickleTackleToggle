@@ -1,14 +1,13 @@
 import Head from 'next/head'
-import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, cloneElement, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { io } from 'socket.io-client'
 
-let socket;
+import { Chat, ChatContainer } from '@/components/Chat'
+
 
 const style = css`
   ul{
@@ -23,55 +22,115 @@ const style = css`
     margin-left: 1em;
     margin-right: 1em;
   }
+  input[name='msg']{
+    width: 100%;
+    border-radius: .5em;
+    border: 1.8px solid #a644a6;
+    color: white;
+    position: sticky;
+    padding: .25em;
+  }
+  .blurBg{
+    width: 40%;
+    height: 20%;
+    background-color: #a644a6;
+    position: absolute;
+    border-radius: 50px;
+    filter: blur(150px);
+    rotate: -30deg;
+    top: 30%;
+  }
+  .blurBg2{
+    width: 40%;
+    height: 20%;
+    background-color: #df6552;
+    position: absolute;
+    border-radius: 50px;
+    filter: blur(120px);
+    right: 10%;
+  }
+  /* width */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #a644a6; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #a644a6; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #d918cf; 
+}
+
 `
 
 export default function Home() {
+  // query url data
   const router = useRouter();
   const { uid } = router.query;
   
-  const [ allMessages, setAllMessages ] = useState([]);
-  const [ msg, setMsg ] = useState('');
-  const [user , setUser] = useState({});
-  const username = user.username;
-  const [timer , setTimer] = useState('') ;
-  const { db } = require('../api/firebaseSetup')
-  const { collection, doc, getDoc } = require('firebase/firestore')
-  async function fetchUserInfo() {
-    if(uid == undefined){
-      router.reload
-    }
-    const userDoc = await getDoc(doc(collection(db, "users"), uid));
-    setUser(userDoc.data())
-  } 
-  useEffect(() => {
-    fetchUserInfo()
-    socketInitializer();
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-  
-  async function socketInitializer (){
-    await fetch('../api/socket');
-    socket = io('singular-starburst-49373c.netlify.app')
-    // socket = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
-    // socketT = io(`https://singular-starburst-49373c.netlify.app/home/${ uid }`)
-    // socketT2 = io('http://localhost:3000')
-    //https://singular-starburst-49373c.netlify.app
-    socket.on('receive-message', data => {
-      setAllMessages((pre) => [...pre, data]);
-      console.log(data)
+  // import database
+  const { db } = require('../api/firebaseSetup');
+  const { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
+  // fetch user data
+  const [ userRef, setUserRef ] = useState({})
+  const fetchUserData = async () => {
+    const docRef = await (await getDoc(doc(collection(db, 'users'), uid))).data()
+    setUserRef(docRef)
+  }
 
+  // chat receive message
+  const [ allMsg, setAllMsg ] = useState([])
+  const fetchChatMessages = async () => {
+    const q = query(collection(db, 'chatMessages'), orderBy('createAt'));
+    onSnapshot(q, snapshot => {
+      const docRef = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+      setAllMsg(docRef)
     })
   }
+ 
+
+  // chat send message
+  const [ msg, setMsg ] = useState('');
   function handleSubmit(e) {
     e.preventDefault();
-
-    console.log("emitted");
-    console.log(socket)
-    socket.emit("send-message", { username, msg });
+    console.log({imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
+    username: userRef.username,
+    displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.id}`,
+    message: msg,
+    createAt: serverTimestamp(),
+    owner: userRef.id})
+    addDoc(collection(db, 'chatMessages'), {
+      imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
+      username: userRef.username,
+      displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.username}`,
+      message: msg,
+      createAt: serverTimestamp()
+    })
     setMsg("");
   }
+
+  // after loading
+  useEffect(()=>{
+    if(router.isReady){
+      fetchUserData();
+      fetchChatMessages();
+    }
+  }, [router.isReady])
+
+  const dummy = useRef(null);
+  useEffect(()=>{
+    dummy.current?.scrollIntoView({behavior: 'smooth'});
+  }, [allMsg])
   return (
     <>
       <Head>
@@ -82,17 +141,23 @@ export default function Home() {
         <style>{ style }</style>
       </Head>
       <main className={styles.main}>
+        <div className='blurBg'></div>
+        <div className='blurBg2'></div>
         <Container width="80%">
-          <h1>{ user.username }</h1>
+          <h1>{ userRef.username }</h1>
         </Container>
-        <Container>
-          {/* <Container width="80%"> { allMessages }</Container> */}
-          <Container width="80%"> { allMessages.map(({username, msg}, index) => (<div key={index}>{username}: {msg}</div>))}</Container>
+        <ChatContainer>
+            { allMsg?.map((chat, index) => {
+              console.log(chat)
+              console.log(chat.message)
+              return (
+              <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
+              )
+            })}
           <form onSubmit={ handleSubmit }>
-            {/* <input type="text" value={ msg } /> */}
-            <input type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
+            <input ref={ dummy } name='msg' type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
           </form>
-        </Container>
+        </ChatContainer>
       </main>
     </>
   )
