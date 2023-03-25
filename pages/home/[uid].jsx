@@ -225,7 +225,7 @@ export default function Home() {
           <div>Quick Match</div>
         </div>
         <Container width="50%" visible={ roomRef? (roomRef.status == 'waiting for matching.'? 'visible' : 'hidden') : 'hidden' }>
-          Matching...
+          waiting for Playing Module...
         </Container>
         <div className='match-status'>
           <ul>

@@ -4,17 +4,9 @@ import { css } from "styled-components";
 import { Button } from "@/components/Button";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import styles from '@/styles/Home.module.css'
 
 const style = css`
-    body{
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        padding:5rem;
-        max-height: 100vh;
-        overflow: hidden;
-    }
     div{
     }
     .inputBox{
@@ -26,6 +18,7 @@ const style = css`
     h1{
         position: absolute;
         top: -.65em;
+        color: white;
     }
     .right{
         margin: 1em auto;
@@ -77,7 +70,7 @@ export default function signUpPage() {
     return (
         <>
             <style>{ style }</style>
-            <main>
+            <main className={styles.main}>
                 <Container>
                     <h1>Sign In</h1>
                     <form>

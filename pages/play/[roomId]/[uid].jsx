@@ -142,7 +142,7 @@ export default function Home() {
         <Container width="80%">
           <h1>{ userRef.username }</h1>
         </Container>
-          Matching...
+          playing...
         <div>{ ChatApp(userRef, router, roomId) }</div>        
       </main>
     </>
