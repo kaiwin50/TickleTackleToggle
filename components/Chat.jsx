@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Box } from "./Container"
 
@@ -55,4 +56,64 @@ const Chat = ({url, displayName, msg, direct}) => (
 
 )
 
+
+export const ChatApp = ( userRef, router, chatRoom ) => {
+    const { db } = require('../pages/api/firebaseSetup');
+    const { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
+
+    const [ msg, setMsg ] = useState('');
+    function handleSubmit(e) {
+      e.preventDefault();
+      console.log({imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
+      username: userRef.username,
+      displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.id}`,
+      message: msg,
+      createAt: serverTimestamp(),
+      owner: userRef.id})
+      addDoc(collection(db, chatRoom), {
+        imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
+        username: userRef.username,
+        displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.username}`,
+        message: msg,
+        createAt: serverTimestamp()
+      })
+      setMsg("");
+    }
+
+    const [ allMsg, setAllMsg ] = useState([])
+    const fetchChatMessages = async () => {
+      const q = query(collection(db, chatRoom), orderBy('createAt'));
+      onSnapshot(q, snapshot => {
+        const docRef = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+        setAllMsg(docRef)
+      })
+    }
+
+    useEffect(()=>{
+        if(router.isReady){
+          fetchUserData();
+          fetchChatMessages();
+      }
+      }, [router.isReady])
+
+      const dummy = useRef(null);
+      useEffect(()=>{
+        dummy.current?.scrollIntoView({behavior: 'smooth'});
+      }, [allMsg])
+
+    return (
+    <>
+        <ChatContainer>
+            { allMsg?.map((chat, index) => {
+              return (
+              <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
+              )
+            })}
+          <form onSubmit={ handleSubmit }>
+            <input ref={ dummy } name='msg' type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
+          </form>
+        </ChatContainer>
+    </>
+    )
+}
 export { Chat, ChatContainer }

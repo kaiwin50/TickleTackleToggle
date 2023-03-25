@@ -17,6 +17,7 @@ const Container = styled(Box)`
   padding: 1em;
   border-radius: 1em;
   position: relative;
+  visibility: ${ props => props.visible || 'visible'};
 `
 
 export { Container, Box }
