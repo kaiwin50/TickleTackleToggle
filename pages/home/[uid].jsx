@@ -6,7 +6,7 @@ import { Button } from '@/components/Button'
 import { useState, useEffect, cloneElement, useRef } from 'react'
 import { useRouter } from 'next/router'
 
-import { Chat, ChatContainer } from '@/components/Chat'
+import { Chat, ChatApp, ChatContainer } from '@/components/Chat'
 
 
 const style = css`
@@ -120,28 +120,7 @@ export default function Home() {
     })
   }
 
-  // chat receive message
-  
- 
-  // chat send message
-  const [ msg, setMsg ] = useState('');
-  function handleSubmit(e) {
-    e.preventDefault();
-    console.log({imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
-    username: userRef.username,
-    displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.id}`,
-    message: msg,
-    createAt: serverTimestamp(),
-    owner: userRef.id})
-    addDoc(collection(db, 'chatMessages'), {
-      imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
-      username: userRef.username,
-      displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.username}`,
-      message: msg,
-      createAt: serverTimestamp()
-    })
-    setMsg("");
-  }
+
 
   // Create Matching Room
   const [players, setPlayers] = useState([])
@@ -220,14 +199,9 @@ export default function Home() {
     if(router.isReady){
       returnHome();
       fetchUserData();
-      fetchChatMessages();
   }
   }, [router.isReady])
 
-  const dummy = useRef(null);
-  useEffect(()=>{
-    dummy.current?.scrollIntoView({behavior: 'smooth'});
-  }, [allMsg])
   useEffect(()=>{
     console.log("userRef change")
     fetchPlayerRoom();
@@ -262,16 +236,7 @@ export default function Home() {
             } */}
           </ul>
         </div>
-        <ChatContainer>
-            { allMsg?.map((chat, index) => {
-              return (
-              <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
-              )
-            })}
-          <form onSubmit={ handleSubmit }>
-            <input ref={ dummy } name='msg' type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
-          </form>
-        </ChatContainer>
+        { ChatApp(userRef, router, 'chatHomePage') }
       </main>
     </>
   )

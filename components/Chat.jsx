@@ -91,7 +91,6 @@ export const ChatApp = ( userRef, router, chatRoom ) => {
 
     useEffect(()=>{
         if(router.isReady){
-          fetchUserData();
           fetchChatMessages();
       }
       }, [router.isReady])
