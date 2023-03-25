@@ -70,7 +70,36 @@ const style = css`
 ::-webkit-scrollbar-thumb:hover {
   background: #d918cf; 
 }
+.quickMatch{
+    width: 15em;
+    height: 15em;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,202,65,1) 2%, rgba(221,148,0,1) 100%);
+    align-items: center;
+    text-align: center;
+    border: .4em solid wheat;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 7.5em;
+    transition: .1s;
+  }
+  .quickMatch:hover{
+    background-color: #eecc8c;
+    background: radial-gradient(circle, #eaa700 2%, #ffaa00 100%);
+    border: .4em solid #bc8319;
+    cursor: pointer;
+  }
 
+  .quickMatch div{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 4em;
+  }
 `
 
 export default function Home() {
@@ -80,25 +109,20 @@ export default function Home() {
   
   // import database
   const { db } = require('../api/firebaseSetup');
-  const { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
+  const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer } = require('firebase/firestore');
+  
+  
   // fetch user data
   const [ userRef, setUserRef ] = useState({})
   const fetchUserData = async () => {
-    const docRef = await (await getDoc(doc(collection(db, 'users'), uid))).data()
-    setUserRef(docRef)
+    onSnapshot(doc(db, 'users', uid), doc => {
+      setUserRef(doc.data());
+    })
   }
 
   // chat receive message
-  const [ allMsg, setAllMsg ] = useState([])
-  const fetchChatMessages = async () => {
-    const q = query(collection(db, 'chatMessages'), orderBy('createAt'));
-    onSnapshot(q, snapshot => {
-      const docRef = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
-      setAllMsg(docRef)
-    })
-  }
+  
  
-
   // chat send message
   const [ msg, setMsg ] = useState('');
   function handleSubmit(e) {
@@ -119,18 +143,95 @@ export default function Home() {
     setMsg("");
   }
 
+  // Create Matching Room
+  const [players, setPlayers] = useState([])
+  const matchingManager = async () => {
+    if(userRef.status != 'matching'){
+      const q = query(collection(db, 'room'), where('status', '==', 'waiting for matching.'), where('rank', '==', userRef.rank.title))
+      const haveRoom = await getCountFromServer(q)
+      if(haveRoom.data().count > 0){
+        onSnapshot(q, (snapshot) => {
+          if(snapshot.docs.length != 0){
+            updateDoc(doc(collection(db, 'room'), snapshot.docs[0].id), {
+              player2: {
+                uid: uid,
+                username: userRef.username
+              },
+              status: 'ready'
+            })
+            updateDoc(doc(db, 'users', uid), {
+              inRoom: snapshot.docs[0].id,
+              status: 'matching'
+            })
+          }
+        })
+      }
+      else{
+        const newRoom = addDoc(collection(db, 'room'), {
+          player1: {
+            uid: uid,
+            username: userRef.username
+          },
+          player2: {
+            uid: '',
+            username: ''
+          },
+          rank: userRef.rank.title,
+          status: 'waiting for matching.',
+          createAt: serverTimestamp()
+        })
+        updateDoc(doc(collection(db, 'users'), uid), {
+          status: 'matching',
+          inRoom: (await newRoom).id
+        })
+        setPlayers(userRef.username);
+
+      }
+    }
+    fetchPlayerRoom
+  }
+  
+  const [roomRef, setRoomRef] = useState({status: 'none'})
+
+  const fetchPlayerRoom = async () => {
+    try{
+      onSnapshot(doc(db, 'room', await userRef.inRoom), doc => {
+        setRoomRef(doc.data())
+        if(roomRef != undefined){
+          if(roomRef.status == 'ready'){
+            router.push(`/play/${ doc.id }/${ uid }`)
+          }
+        }
+      })
+    }catch(e){
+      console.log('not valid')
+    }
+    
+    }
+  
+  const returnHome = () => {
+    updateDoc(doc(db, 'users', uid), {
+      inRoom: 'none',
+      status: 'Online'
+    })
+  }
   // after loading
   useEffect(()=>{
     if(router.isReady){
+      returnHome();
       fetchUserData();
       fetchChatMessages();
-    }
+  }
   }, [router.isReady])
 
   const dummy = useRef(null);
   useEffect(()=>{
     dummy.current?.scrollIntoView({behavior: 'smooth'});
   }, [allMsg])
+  useEffect(()=>{
+    console.log("userRef change")
+    fetchPlayerRoom();
+  }, [matchingManager])
   return (
     <>
       <Head>
@@ -146,10 +247,23 @@ export default function Home() {
         <Container width="80%">
           <h1>{ userRef.username }</h1>
         </Container>
+        <div className='quickMatch' onClick={matchingManager}>
+          <div>Quick Match</div>
+        </div>
+        <Container width="50%" visible={ roomRef? (roomRef.status == 'waiting for matching.'? 'visible' : 'hidden') : 'hidden' }>
+          Matching...
+        </Container>
+        <div className='match-status'>
+          <ul>
+            {/* {
+              players?.map(({username, uid}, index) => (
+                <li key={index}><span>player{index}: </span><span>{ username }</span></li>
+              ))
+            } */}
+          </ul>
+        </div>
         <ChatContainer>
             { allMsg?.map((chat, index) => {
-              console.log(chat)
-              console.log(chat.message)
               return (
               <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
               )
