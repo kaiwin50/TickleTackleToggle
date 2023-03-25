@@ -29,6 +29,7 @@ const style = css`
     color: white;
     position: sticky;
     padding: .25em;
+    background-color: black;
   }
   .blurBg{
     width: 40%;
