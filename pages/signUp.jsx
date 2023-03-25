@@ -3,6 +3,7 @@ import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
 import { Button } from "@/components/Button";
 import { useState } from "react";
+import { useRouter } from "next/router";
 const style = css`
     body{
         display: flex;
@@ -43,8 +44,9 @@ export default function signUpPage() {
     const [u_username, setUsername] = useState("");
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
+    const router = useRouter();
 
-    const { getDocs, addDoc, collection, query, onSnapshot, where, getCountFromServer } = require("firebase/firestore");
+    const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup")
     function handleClick() {
         console.log('increment like count');
@@ -66,6 +68,7 @@ export default function signUpPage() {
               status: "offline"
             });
             console.log("Document written with ID: ", docRef.id);
+            router.push('.')
           }
           catch (e) {
             console.error("sadsaf",e)
