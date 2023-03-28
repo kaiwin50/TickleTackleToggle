@@ -121,13 +121,23 @@ export default function Home() {
     })
   }
 
-  const endPlay = async () => {
-    await updateDoc(doc(db, 'users', uid), {
-      status: 'idle',
-      inRoom: ''
+  const endPlay = async ()=>{
+    try{
+      players.forEach(player => {
+        updateDoc(doc(db, 'users', uid), {
+          status: 'idle',
+          inRoom: ''
+        })
+        deleteDoc(doc(doc(db, 'room', roomId), 'players', player.id));
     })
+    deleteDoc(doc(db, 'room', roomId))
     router.push(`../../home/${ uid }`)
+    }
+    catch(e){
+      console.error(e)
+    }
   }
+
   // after loading
   useEffect(()=>{
     if(router.isReady){

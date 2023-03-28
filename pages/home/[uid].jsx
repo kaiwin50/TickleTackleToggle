@@ -3,10 +3,12 @@ import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import { useState, useEffect, cloneElement, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { Chat, ChatApp, ChatContainer } from '@/components/Chat'
+import { ChatApp } from '@/components/Chat'
+import { User } from '@/class/User'
+import { Room } from '@/class/Room'
 
 const style = css`
   input[name='msg']{
@@ -89,62 +91,32 @@ const style = css`
   }
 
 `
+// initial room data use for escape error when some variable is unload.
+const roomInit = {
+  status: 'waiting for matching.', player1: {username: 'none', uid: ''}, player2: {username: 'none', uid: ''}
+}
 
 export default function Home() {
   // query url data
   const router = useRouter();
   const { uid } = router.query;
-  // import database
+  // import database.
   const { db } = require('../api/firebaseSetup');
-  const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, serverTimestamp, getCountFromServer, getDocs, setDoc } = require('firebase/firestore');
-  
+  const { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer, deleteDoc, } = require('firebase/firestore');
+  // user refference : use as refference of realtime update user info.
   const [ userRef, setUserRef ] = useState({})
-  const fetchUserData = () => {
-    onSnapshot(doc(db, 'users', uid), doc => {
-      setUserRef(doc.data());
-      console.log('userRef updated!!')
-    })
+  const user = new User();
+
+// condition on load: use for escape from error when uid is unreaded.
+  useEffect(()=>{
+    if(router.isReady){
+      user.startSnapshot(uid, setUserRef);
   }
+  }, [router.isReady])
 
-
-  // Create Room
-  const createRoom = async () => {
-    const newRoom = await addDoc(collection(db, 'room'), {
-          rank: userRef.rank.title,
-          status: 'waiting for matching.',
-          createAt: serverTimestamp()
-        })
-        setDoc(doc(newRoom, 'players', uid), {
-          username: userRef.username,
-          isReady: false
-        })
-        updateDoc(doc(collection(db, 'users'), uid), {
-          status: 'matching',
-          inRoom: (newRoom).id
-        })
-  }
-
-  // Join room
-  const joinRoom = (query) => {
-    onSnapshot(query, snapshot => {
-      snapshot.docs.forEach( queryDoc => {
-        console.log(userRef.username)
-        console.log(queryDoc.username)
-        updateDoc(doc(db, 'room', queryDoc.id), {
-          status: 'ready'
-        })
-        setDoc(doc(doc(db, 'room', queryDoc.id), 'players', uid), {
-          username: userRef.username,
-          isReady: false
-        })
-        updateDoc(doc(db, 'users', uid), {
-          inRoom: queryDoc.id,
-          status: 'matching'
-        })
-      });
-    })
-  }
-
+  // room class general room function.
+  const room = new Room();
+  // Matching Manager.
   const matchingManager = async () => {
     console.log("matchingManager run")
     const valid = userRef.status == 'idle' ? true : false;
@@ -152,58 +124,42 @@ export default function Home() {
       const q = query(collection(db, 'room'), where('status', '==', 'waiting for matching.'), where('rank', '==', userRef.rank.title), limit(1))
       const haveRoom = await getCountFromServer(q)
       if(haveRoom.data().count > 0){
-        joinRoom(q)
+        room.joinRoom(q, userRef)
         console.log('joined room')
       }
       else{
-        createRoom()
+        const newRoom = await room.createRoom(userRef.rank.title); 
+        room.addPlayer(newRoom, userRef);
         console.log('create room')
       }
       console.log('Matching end')
    }
   }
-  const roomInit = {
-    status: 'waiting for matching.', player1: {username: 'none', uid: ''}, player2: {username: 'none', uid: ''}
-  }
+  // room refference that look up change realtime on the current room.
   const [roomRef, setRoomRef] = useState(roomInit)
-  const fetchPlayerRoom = (roomId) => {
-      onSnapshot(doc(db, 'room', roomId), doc => {
-        setRoomRef({...doc.data(), id: doc.id})
-      })
-      console.table(roomRef)
-    }
-  // after loading
-  useEffect(()=>{
-    if(router.isReady){
-      fetchUserData();
-  }
-  }, [router.isReady])
-
+  // the fetch function delay on updating for some reason. So I manually get it with getDoc and await.   
   useEffect(()=>{
     const fetchRoomId = async () => {
       try{
         const userDoc = (await getDoc(doc(db, 'users', uid))).data()
-        fetchPlayerRoom(userDoc.inRoom)
+        room.startSnapshot(userDoc.inRoom, setRoomRef);
       }
       catch (e) {
+        // indexOf Error for sometimes the doc is never exist or no longer exist.
         console.warn("still doesn't has room")
       }
     }
     fetchRoomId()
   }, [userRef.inRoom])
 
+  // get confirm from user if they want to play the match
   const userReady = () => {
     updateDoc(doc(doc(db, 'room', userRef.inRoom), 'players', uid), {
       isReady: true
     })
   }
-  const reset = async ()=>{
-    await updateDoc(doc(db, 'users', uid), {
-      status: 'idle',
-      inRoom: ''
-    })
-    // router.reload()
-  }
+
+  // all players in the current room
   const [players, setPlayers] = useState([])
   const fetchUserInRoom = async () => {
     try{
@@ -220,7 +176,7 @@ export default function Home() {
       fetchUserInRoom()
     }
   }, [roomRef])
-
+  // Check if both of them are ready an redirect to play area.
   const isPlayersReady = async () => {
     try{
       const q = query(collection(doc(db, 'room', roomRef.id), 'players'), where('isReady', '==', true))
@@ -231,12 +187,14 @@ export default function Home() {
       }
     }
     catch (e){
-      console.log(e)
+      console.error(`TypeError: Cannot read properties of undefined (reading 'indexOf')`)
     }
   }
   useEffect(()=>{
     isPlayersReady()
   }, [players])
+
+  const destroyRoom = () => (room.destroy(userRef.inRoom, players))
   return (
     <>
       <Head>
@@ -255,6 +213,9 @@ export default function Home() {
         <div className='quickMatch' onClick={matchingManager}>
           <div>Quick Match</div>
         </div>
+        <div className='quickMatch createX' onClick={matchingManager}>
+          <div>Quick Match</div>
+        </div>
         <Container width="50%" visible={ userRef.status == 'matching'? 'visible' : 'hidden' }>
           Matching...<br/>
           <Container visible= { players[0] != undefined ? 'visble' : 'hidden'}> { userRef.inRoom != '' ? players[0]?.data().username : null }
@@ -262,19 +223,10 @@ export default function Home() {
           <Container visible= { players[1] != undefined ? 'visible' : 'hidden' }> { userRef.inRoom != '' ? players[1]?.data().username : null }
           </Container>
           <Button onClick={ userReady }>Ready</Button>
-          <Button onClick={ reset }>Cancel</Button>
+          <Button onClick={ destroyRoom }>Cancel</Button>
 
         </Container>
-        <Button onClick={ reset }>reset</Button>
-        <div className='match-status'>
-          <ul>
-            {/* {
-              players?.map(({username, uid}, index) => (
-                <li key={index}><span>player{index}: </span><span>{ username }</span></li>
-              ))
-            } */}
-          </ul>
-        </div>
+        <Button onClick={ destroyRoom }>reset</Button>
         { ChatApp(userRef, router, 'homePage') }
       </main>
     </>
