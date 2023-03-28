@@ -40,7 +40,7 @@ export default function signUpPage() {
     const [notice, setNotice] = useState("");
     const router = useRouter();
 
-    const { addDoc, collection, query, where, getCountFromServer, collection } = require("firebase/firestore");
+    const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup")
     function handleClick() {
         console.log('increment like count');
