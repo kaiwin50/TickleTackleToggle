@@ -57,9 +57,9 @@ const Chat = ({url, displayName, msg, direct}) => (
 )
 
 
-export const ChatApp = ( userRef, router, chatRoom ) => {
+export const ChatApp = ( userRef, router, roomId ) => {
     const { db } = require('../pages/api/firebaseSetup');
-    const { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
+    const { addDoc, doc, collection, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
 
     const [ msg, setMsg ] = useState('');
     function handleSubmit(e) {
@@ -70,7 +70,7 @@ export const ChatApp = ( userRef, router, chatRoom ) => {
       message: msg,
       createAt: serverTimestamp(),
       owner: userRef.id})
-      addDoc(collection(db, chatRoom), {
+      addDoc(collection(doc(db, 'room', roomId), 'chat'), {
         imgUrl: userRef.imgUrl? userRef.imgUrl : '/profile.png',
         username: userRef.username,
         displayName: userRef.displayname ? userRef.displayname : `anonymous_${userRef.username}`,
@@ -82,7 +82,7 @@ export const ChatApp = ( userRef, router, chatRoom ) => {
 
     const [ allMsg, setAllMsg ] = useState([])
     const fetchChatMessages = async () => {
-      const q = query(collection(db, chatRoom), orderBy('createAt'));
+      const q = query(collection(doc(db, 'room', roomId), 'chat'), orderBy('createAt'));
       onSnapshot(q, snapshot => {
         const docRef = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
         setAllMsg(docRef)

@@ -2,7 +2,7 @@ import { Container } from "@/components/Container";
 import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
 import { Button } from "@/components/Button";
-import { useState } from "react";
+import { createContext, useState } from "react";
 import { useRouter } from "next/router";
 import styles from '@/styles/Home.module.css'
 
@@ -30,17 +30,15 @@ const style = css`
         display: block;
     }
 `
-
-
-
 export default function signUpPage() {
     const [u_username, setUsername] = useState("");
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
-    const { getDocs, collection, query, where, doc, setDoc, updateDoc } = require("firebase/firestore");
+    const { getDocs, collection, query, where, doc, setDoc, updateDoc, onSnapshot } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup");
     const router = useRouter();
-    async function signIn () {
+    async function signIn (e) {
+        e.preventDefault();
         const q = query(collection(db, "users"), where("username", "==", u_username));
         const isExist = await getDocs(q);
         console.log(q);
@@ -51,8 +49,8 @@ export default function signUpPage() {
             console.log(doc);
             if(u_password == userDoc.password){
                 console.log("successful login to ", userID)
-                await updateDoc(doc(collection(db, "users"), userID), {
-                    status : "online"
+                await updateDoc(doc(db, "users", userID), {
+                    status : "idle"
                 });
                 const local = `./home/${ userID }`
                 router.push(local)
@@ -73,7 +71,7 @@ export default function signUpPage() {
             <main className={styles.main}>
                 <Container>
                     <h1>Sign In</h1>
-                    <form>
+                    <form onSubmit={signIn}>
                         <div className="inputBox">
                             <StyledInput type="text" name="username" id="username" onChange={ (e)=>(setUsername(e.target.value)) } placeholder=" " required></StyledInput>
                             <label>Username</label>
@@ -82,9 +80,9 @@ export default function signUpPage() {
                             <StyledInput type="password" name="password" id="password" onChange={ (e)=>(setPassword(e.target.value)) } placeholder=" " required></StyledInput>    
                             <label>Password</label>
                         </div>
-                    </form>
+                    <div  className="inputBox right" ><Button type="submit">sign up</Button></div>
                     <small>{ notice }</small>
-                    <div className="inputBox right" ><Button onClick={ signIn }>sign up</Button></div>
+                    </form>
                 </Container>
             </main>
         </>

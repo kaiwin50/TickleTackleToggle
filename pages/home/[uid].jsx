@@ -8,20 +8,7 @@ import { useRouter } from 'next/router'
 
 import { Chat, ChatApp, ChatContainer } from '@/components/Chat'
 
-
 const style = css`
-  ul{
-    list-style-type: none;
-    justify-content: center;
-    align-items: center;
-    width: fit-content;
-    margin: auto;
-  }
-  li {
-    display: inline-flex;
-    margin-left: 1em;
-    margin-right: 1em;
-  }
   input[name='msg']{
     width: 100%;
     border-radius: .5em;
@@ -91,7 +78,6 @@ const style = css`
     border: .4em solid #bc8319;
     cursor: pointer;
   }
-
   .quickMatch div{
     display: flex;
     flex-wrap: wrap;
@@ -101,112 +87,156 @@ const style = css`
     height: 100%;
     font-size: 4em;
   }
+
 `
 
 export default function Home() {
   // query url data
   const router = useRouter();
   const { uid } = router.query;
-  
   // import database
   const { db } = require('../api/firebaseSetup');
-  const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer } = require('firebase/firestore');
+  const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, serverTimestamp, getCountFromServer, getDocs, setDoc } = require('firebase/firestore');
   
-  
-  // fetch user data
   const [ userRef, setUserRef ] = useState({})
-  const fetchUserData = async () => {
+  const fetchUserData = () => {
     onSnapshot(doc(db, 'users', uid), doc => {
       setUserRef(doc.data());
+      console.log('userRef updated!!')
     })
   }
 
 
-
-  // Create Matching Room
-  const [players, setPlayers] = useState([])
-  const matchingManager = async () => {
-    if(userRef.status != 'matching'){
-      const q = query(collection(db, 'room'), where('status', '==', 'waiting for matching.'), where('rank', '==', userRef.rank.title))
-      const haveRoom = await getCountFromServer(q)
-      if(haveRoom.data().count > 0){
-        onSnapshot(q, (snapshot) => {
-          if(snapshot.docs.length != 0){
-            updateDoc(doc(collection(db, 'room'), snapshot.docs[0].id), {
-              player2: {
-                uid: uid,
-                username: userRef.username
-              },
-              status: 'ready'
-            })
-            updateDoc(doc(db, 'users', uid), {
-              inRoom: snapshot.docs[0].id,
-              status: 'matching'
-            })
-          }
-        })
-      }
-      else{
-        const newRoom = addDoc(collection(db, 'room'), {
-          player1: {
-            uid: uid,
-            username: userRef.username
-          },
-          player2: {
-            uid: '',
-            username: ''
-          },
+  // Create Room
+  const createRoom = async () => {
+    const newRoom = await addDoc(collection(db, 'room'), {
           rank: userRef.rank.title,
           status: 'waiting for matching.',
           createAt: serverTimestamp()
         })
+        setDoc(doc(newRoom, 'players', uid), {
+          username: userRef.username,
+          isReady: false
+        })
         updateDoc(doc(collection(db, 'users'), uid), {
           status: 'matching',
-          inRoom: (await newRoom).id
+          inRoom: (newRoom).id
         })
-        setPlayers(userRef.username);
-
-      }
-    }
-    fetchPlayerRoom
   }
-  
-  const [roomRef, setRoomRef] = useState({status: 'none'})
 
-  const fetchPlayerRoom = async () => {
-    try{
-      onSnapshot(doc(db, 'room', await userRef.inRoom), doc => {
-        setRoomRef(doc.data())
-        if(roomRef != undefined){
-          if(roomRef.status == 'ready'){
-            router.push(`/play/${ doc.id }/${ uid }`)
-          }
-        }
-      })
-    }catch(e){
-      console.log('not valid')
-    }
-    
-    }
-  
-  const returnHome = () => {
-    updateDoc(doc(db, 'users', uid), {
-      inRoom: 'none',
-      status: 'Online'
+  // Join room
+  const joinRoom = (query) => {
+    onSnapshot(query, snapshot => {
+      snapshot.docs.forEach( queryDoc => {
+        console.log(userRef.username)
+        console.log(queryDoc.username)
+        updateDoc(doc(db, 'room', queryDoc.id), {
+          status: 'ready'
+        })
+        setDoc(doc(doc(db, 'room', queryDoc.id), 'players', uid), {
+          username: userRef.username,
+          isReady: false
+        })
+        updateDoc(doc(db, 'users', uid), {
+          inRoom: queryDoc.id,
+          status: 'matching'
+        })
+      });
     })
   }
+
+  const matchingManager = async () => {
+    console.log("matchingManager run")
+    const valid = userRef.status == 'idle' ? true : false;
+    if(valid){
+      const q = query(collection(db, 'room'), where('status', '==', 'waiting for matching.'), where('rank', '==', userRef.rank.title), limit(1))
+      const haveRoom = await getCountFromServer(q)
+      if(haveRoom.data().count > 0){
+        joinRoom(q)
+        console.log('joined room')
+      }
+      else{
+        createRoom()
+        console.log('create room')
+      }
+      console.log('Matching end')
+   }
+  }
+  const roomInit = {
+    status: 'waiting for matching.', player1: {username: 'none', uid: ''}, player2: {username: 'none', uid: ''}
+  }
+  const [roomRef, setRoomRef] = useState(roomInit)
+  const fetchPlayerRoom = (roomId) => {
+      onSnapshot(doc(db, 'room', roomId), doc => {
+        setRoomRef({...doc.data(), id: doc.id})
+      })
+      console.table(roomRef)
+    }
   // after loading
   useEffect(()=>{
     if(router.isReady){
-      returnHome();
       fetchUserData();
   }
   }, [router.isReady])
 
   useEffect(()=>{
-    console.log("userRef change")
-    fetchPlayerRoom();
-  }, [matchingManager])
+    const fetchRoomId = async () => {
+      try{
+        const userDoc = (await getDoc(doc(db, 'users', uid))).data()
+        fetchPlayerRoom(userDoc.inRoom)
+      }
+      catch (e) {
+        console.warn("still doesn't has room")
+      }
+    }
+    fetchRoomId()
+  }, [userRef.inRoom])
+
+  const userReady = () => {
+    updateDoc(doc(doc(db, 'room', userRef.inRoom), 'players', uid), {
+      isReady: true
+    })
+  }
+  const reset = async ()=>{
+    await updateDoc(doc(db, 'users', uid), {
+      status: 'idle',
+      inRoom: ''
+    })
+    // router.reload()
+  }
+  const [players, setPlayers] = useState([])
+  const fetchUserInRoom = async () => {
+    try{
+      onSnapshot(collection(doc(db, 'room', roomRef.id), 'players'), snapshot => {
+        setPlayers(snapshot.docs);
+      });
+    }
+    catch(e){
+      console.warn("still doesn't has room")
+    }
+  }
+  useEffect(()=>{
+    if(userRef.inRoom != ''){
+      fetchUserInRoom()
+    }
+  }, [roomRef])
+
+  const isPlayersReady = async () => {
+    try{
+      const q = query(collection(doc(db, 'room', roomRef.id), 'players'), where('isReady', '==', true))
+      const countReady = await getCountFromServer(q)
+      console.log(countReady.data().count)
+      if(countReady.data().count == 2){
+        router.replace(`../play/${ roomRef.id }/${ uid }`);
+      }
+    }
+    catch (e){
+      console.log(e)
+    }
+  }
+  useEffect(()=>{
+    isPlayersReady()
+  }, [players])
   return (
     <>
       <Head>
@@ -220,14 +250,22 @@ export default function Home() {
         <div className='blurBg'></div>
         <div className='blurBg2'></div>
         <Container width="80%">
-          <h1>{ userRef.username }</h1>
+        <h1>{ userRef.username }</h1>
         </Container>
         <div className='quickMatch' onClick={matchingManager}>
           <div>Quick Match</div>
         </div>
-        <Container width="50%" visible={ roomRef? (roomRef.status == 'waiting for matching.'? 'visible' : 'hidden') : 'hidden' }>
-          waiting for Playing Module...
+        <Container width="50%" visible={ userRef.status == 'matching'? 'visible' : 'hidden' }>
+          Matching...<br/>
+          <Container visible= { players[0] != undefined ? 'visble' : 'hidden'}> { userRef.inRoom != '' ? players[0]?.data().username : null }
+          </Container>
+          <Container visible= { players[1] != undefined ? 'visible' : 'hidden' }> { userRef.inRoom != '' ? players[1]?.data().username : null }
+          </Container>
+          <Button onClick={ userReady }>Ready</Button>
+          <Button onClick={ reset }>Cancel</Button>
+
         </Container>
+        <Button onClick={ reset }>reset</Button>
         <div className='match-status'>
           <ul>
             {/* {
@@ -237,7 +275,7 @@ export default function Home() {
             } */}
           </ul>
         </div>
-        { ChatApp(userRef, router, 'chatHomePage') }
+        { ChatApp(userRef, router, 'homePage') }
       </main>
     </>
   )

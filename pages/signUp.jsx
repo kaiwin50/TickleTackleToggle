@@ -33,7 +33,6 @@ const style = css`
 `
 
 
-
 export default function signUpPage() {
     const [u_email, setEmail] = useState("");
     const [u_username, setUsername] = useState("");
@@ -41,12 +40,13 @@ export default function signUpPage() {
     const [notice, setNotice] = useState("");
     const router = useRouter();
 
-    const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
+    const { addDoc, collection, query, where, getCountFromServer, collection } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup")
     function handleClick() {
         console.log('increment like count');
       }
-    async function signUp () {
+    async function signUp (e) {
+        e.preventDefault();
         const q = query(collection(db, "users"), where("username", "==", u_username));
         const isValid = await getCountFromServer(q);
         console.log(isValid.data().count)
@@ -86,7 +86,7 @@ export default function signUpPage() {
       <main className={styles.main}>
                 <Container>
                     <h1>Sign up</h1>
-                    <form>
+                    <form onSubmit={ signUp }>
                         <div className="inputBox">
                             <StyledInput type="email" name="email" id="email" onChange={ (e)=>(setEmail(e.target.value)) } placeholder=" " required pattern="\S+"></StyledInput>
                             <label>Email</label>
@@ -100,8 +100,8 @@ export default function signUpPage() {
                             <StyledInput type="password" name="password" id="password" onChange={ (e)=>(setPassword(e.target.value)) } placeholder=" " required></StyledInput>    
                             <label>Password</label>
                         </div>
+                        <div className="inputBox right" ><Button type="submit">sign up</Button></div>
                     </form>
-                    <div className="inputBox right" ><Button onClick={ signUp }>sign up</Button></div>
                 </Container>
       </main>
     </>

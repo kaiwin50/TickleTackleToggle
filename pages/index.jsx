@@ -3,6 +3,7 @@ import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
+import Link from 'next/link'
 
 
 const style = css`
@@ -33,8 +34,8 @@ export default function Home() {
       <main className={styles.main}>
         <Container width="80%">
           <ul>
-            <li><a href='./signIn'><Button>Sign In</Button></a></li>
-            <li><a href='./signUp'><Button>sign up</Button></a></li>
+            <li><Link href='./signIn'><Button>Sign In</Button></Link></li>
+            <li><Link href='./signUp'><Button>sign up</Button></Link></li>
           </ul>
         </Container>
 

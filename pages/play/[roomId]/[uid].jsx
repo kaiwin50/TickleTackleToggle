@@ -3,10 +3,11 @@ import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import { useState, useEffect, cloneElement, useRef } from 'react'
+import { useState, useEffect, cloneElement, useRef, useContext } from 'react'
 import { useRouter } from 'next/router'
 
 import { Chat, ChatApp, ChatContainer } from '@/components/Chat'
+import { UserContext } from '@/pages/home/[uid]'
 
 
 const style = css`
@@ -111,15 +112,22 @@ export default function Home() {
   const { db } = require('../../api/firebaseSetup');
   const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer } = require('firebase/firestore');
   
-  
   // fetch user data
   const [ userRef, setUserRef ] = useState({});
   const fetchUserData = async () => {
     onSnapshot(doc(db, 'users', uid), doc => {
       setUserRef(doc.data());
+      console.log('userRef updated!!')
     })
   }
 
+  const endPlay = async () => {
+    await updateDoc(doc(db, 'users', uid), {
+      status: 'idle',
+      inRoom: ''
+    })
+    router.push(`../../home/${ uid }`)
+  }
   // after loading
   useEffect(()=>{
     if(router.isReady){
@@ -143,6 +151,8 @@ export default function Home() {
           <h1>{ userRef.username }</h1>
         </Container>
           playing...
+          <Button onClick={ endPlay }>end</Button>
+        
         <div>{ ChatApp(userRef, router, roomId) }</div>        
       </main>
     </>
