@@ -1,18 +1,18 @@
-const { setDoc, doc, addDoc, collection, serverTimestamp, updateDoc, onSnapshot, deleteDoc } = require("firebase/firestore")
+const { setDoc, doc, addDoc, collection, serverTimestamp, updateDoc, onSnapshot, deleteDoc, getDocs } = require("firebase/firestore")
 const { db } = require("@/pages/api/firebaseSetup");
 
 export class Room {
-    constructor(){
+    constructor() {
     }
-    async createRoom(title){
+    async create(title, matching = true) {
         const newRoom = await addDoc(collection(db, 'room'), {
             rank: title,
-            status: 'waiting for matching.',
+            status: matching ? 'waiting for matching.' : 'idle',
             createAt: serverTimestamp()
-          })
+        })
         return (newRoom)
     }
-    addPlayer(roomRef, userRef){
+    addPlayer(roomRef, userRef) {
         setDoc(doc(roomRef, 'players', userRef.id), {
             username: userRef.username,
             isReady: false
@@ -22,33 +22,32 @@ export class Room {
             inRoom: roomRef.id
         })
     }
-    joinRoom(query, userRef){
-        onSnapshot(query, snapshot => {
-            snapshot.docs.forEach( queryDoc => {
-              updateDoc(doc(db, 'room', queryDoc.id), {
-                status: 'ready'
-              })
-              this.addPlayer(queryDoc, userRef)
-            });
+    async getRoomId(query) {
+        console.log('r1')
+        var rid;
+        (await getDocs(query)).docs.forEach(doc =>{
+            console.log(doc.id)
+            rid = doc.id
         })
+        return rid
     }
-    startSnapshot(roomId, setter){
+    subscribe(roomId, setter) {
         onSnapshot(doc(db, 'room', roomId), doc => {
-            setter({...doc.data(), id: doc.id})
+            setter({ ...doc.data(), id: doc.id })
         })
     }
-    async destroy(roomId, players){
-        try{
+    async destroy(roomId, players) {
+        try {
             players.forEach(player => {
-              updateDoc(doc(db, 'users', player.id), {
-                status: 'idle',
-                inRoom: ''
-              })
-              deleteDoc(doc(doc(db, 'room', roomId), 'players', player.id));
-          })
-          deleteDoc(doc(db, 'room', roomId))
+                updateDoc(doc(db, 'users', player.id), {
+                    status: 'idle',
+                    inRoom: ''
+                })
+                deleteDoc(doc(doc(db, 'room', roomId), 'players', player.id));
+            })
+            deleteDoc(doc(db, 'room', roomId))
         }
-        catch(e){
+        catch (e) {
             console.error(e)
         }
     }

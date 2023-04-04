@@ -7,6 +7,7 @@ class User{
     startSnapshot(uid, setter){
         onSnapshot(doc(db, 'users', uid), doc => {
             setter({...doc.data(), id: uid})
+            console.log('update')
         })
     }
     getUserInfoById(uid){

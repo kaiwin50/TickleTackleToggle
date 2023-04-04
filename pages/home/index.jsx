@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import { ChatApp } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
+import auth from '../api/auth'
 
 const style = css`
   input[name='msg']{
@@ -103,10 +104,11 @@ const roomInit = {
   status: 'waiting for matching.', player1: { username: 'none', uid: '' }, player2: { username: 'none', uid: '' }
 }
 
+var uid;
+
 export default function Home() {
   // query url data
   const router = useRouter();
-  const { uid } = router.query;
   // import database.
   const { db } = require('../api/firebaseSetup');
   const { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer } = require('firebase/firestore');
@@ -115,13 +117,19 @@ export default function Home() {
   const user = new User();
   // condition on load: use for escape from error when uid is unreaded.
   useEffect(() => {
-    if (router.isReady) {
+    try {
+      uid = auth.currentUser.uid
       user.startSnapshot(uid, setUserRef);
     }
-  }, [router.isReady])
+    catch (e) {
+      router.push('.');
+    }
+  }, [])
 
   // room class general room function.
   const room = new Room();
+  // const [rid, setRid] = useState();
+
   // Matching Manager.
   const matchingManager = async () => {
     console.log("matchingManager run")
@@ -129,8 +137,11 @@ export default function Home() {
     if (valid) {
       const q = query(collection(db, 'room'), where('status', '==', 'waiting for matching.'), where('rank', '==', userRef.rank.title), limit(1))
       const haveRoom = await getCountFromServer(q)
+      console.log(haveRoom.data().count);
       if (haveRoom.data().count > 0) {
-        room.join(q, userRef)
+        const rid = await room.getRoomId(q);
+        console.log('rid: ', rid)
+        room.addPlayer(doc(db, 'room', rid), userRef);
         console.log('joined room')
       }
       else {
@@ -191,11 +202,11 @@ export default function Home() {
       const countReady = await getCountFromServer(q)
       console.log(countReady.data().count)
       if (countReady.data().count == 2) {
-        router.replace(`../play/${roomRef.id}/${uid}`);
+        router.replace(`../play/${roomRef.id}`);
       }
     }
     catch (e) {
-      console.error(`TypeError: Cannot read properties of undefined (reading 'indexOf')`)
+      console.warn('expected indexOf error.')
     }
   }
   useEffect(() => {
@@ -232,7 +243,6 @@ export default function Home() {
           </Container>
           <Button onClick={userReady}>Ready</Button>
           <Button onClick={destroyRoom}>Cancel</Button>
-
         </Container>
         <Button onClick={destroyRoom}>reset</Button>
         {ChatApp(userRef, router, 'homePage')}

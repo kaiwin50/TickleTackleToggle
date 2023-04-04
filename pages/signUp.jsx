@@ -42,28 +42,18 @@ export default function signUpPage() {
 
     const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup")
+    const { SignUp } = require('./api/auth');
     function handleClick() {
         console.log('increment like count');
       }
-    async function signUp (e) {
+    async function formHandler (e) {
         e.preventDefault();
         const q = query(collection(db, "users"), where("username", "==", u_username));
         const isValid = await getCountFromServer(q);
         console.log(isValid.data().count)
         if(isValid.data().count == 0){
           try {
-            const docRef = await addDoc(collection(db, "users"), {
-              email: u_email,
-              username: u_username,
-              password: u_password,
-              rank: {
-                title: "koy",
-                point: 0
-              },
-              status: "offline"
-            });
-            console.log("Document written with ID: ", docRef.id);
-            router.push('.')
+            SignUp(u_email, u_username, u_password, router);
           }
           catch (e) {
             console.error("sadsaf",e)
@@ -86,7 +76,7 @@ export default function signUpPage() {
       <main className={styles.main}>
                 <Container>
                     <h1>Sign up</h1>
-                    <form onSubmit={ signUp }>
+                    <form onSubmit={ formHandler }>
                         <div className="inputBox">
                             <StyledInput type="email" name="email" id="email" onChange={ (e)=>(setEmail(e.target.value)) } placeholder=" " required pattern="\S+"></StyledInput>
                             <label>Email</label>

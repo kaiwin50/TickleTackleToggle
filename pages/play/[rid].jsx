@@ -8,6 +8,8 @@ import { useRouter } from 'next/router'
 
 import { Chat, ChatApp, ChatContainer } from '@/components/Chat'
 import { UserContext } from '@/pages/home/[uid]'
+import auth from '../api/auth'
+import { User } from '@/class/User'
 
 
 const style = css`
@@ -103,13 +105,27 @@ const style = css`
   }
 `
 
+var uid;
+
+
 export default function Home() {
   // query url data
   const router = useRouter();
-  const { roomId, uid } = router.query;
-  
+  const { rid } = router.query;
+  const user = new User();
+
+  useEffect(() => {
+    try {
+      uid = auth.currentUser.uid
+      user.startSnapshot(uid, setUserRef);
+    }
+    catch (e) {
+      router.replace('../');
+    }
+  }, [])
+
   // import database
-  const { db } = require('../../api/firebaseSetup');
+  const { db } = require('../api/firebaseSetup');
   const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer } = require('firebase/firestore');
   
   // fetch user data
@@ -128,22 +144,15 @@ export default function Home() {
           status: 'idle',
           inRoom: ''
         })
-        deleteDoc(doc(doc(db, 'room', roomId), 'players', player.id));
+        deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
     })
-    deleteDoc(doc(db, 'room', roomId))
-    router.push(`../../home/${ uid }`)
+    deleteDoc(doc(db, 'room', rid))
+    router.push(`../../home`)
     }
     catch(e){
-      console.error(e)
+      console.error(e.code)
     }
   }
-
-  // after loading
-  useEffect(()=>{
-    if(router.isReady){
-      fetchUserData();
-  }
-  }, [router.isReady])
 
   return (
     <>
@@ -163,7 +172,7 @@ export default function Home() {
           playing...
           <Button onClick={ endPlay }>end</Button>
         
-        <div>{ ChatApp(userRef, router, roomId) }</div>        
+        <div>{ ChatApp(userRef, router, rid) }</div>        
       </main>
     </>
   )
