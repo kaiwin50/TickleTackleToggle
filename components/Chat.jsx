@@ -29,8 +29,8 @@ const ChatProfileImg = styled.img`
     height: 100%;
 `
 const ChatContainer = styled.div`
-    width: 35em;
-    height: 30%;
+    width: 25em;
+    height: 20%;
     background-color: #5757575a;
     position: fixed;
     bottom: 0;

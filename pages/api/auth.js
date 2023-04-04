@@ -1,5 +1,5 @@
 const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require('firebase/auth');
-const { setDoc, doc } = require('firebase/firestore');
+const { setDoc, doc, updateDoc, onSnapshot } = require('firebase/firestore');
 const { db, default: app } = require('./firebaseSetup');
 
 const auth = getAuth(app);
@@ -31,5 +31,8 @@ export const SignUp = (email, username, password, router) => {
         console.error(e.message)
     })
 }
+
+
+
 
 export default auth;

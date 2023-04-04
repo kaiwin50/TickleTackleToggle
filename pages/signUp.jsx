@@ -43,9 +43,7 @@ export default function signUpPage() {
     const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
     const { db } = require("./api/firebaseSetup")
     const { SignUp } = require('./api/auth');
-    function handleClick() {
-        console.log('increment like count');
-      }
+
     async function formHandler (e) {
         e.preventDefault();
         const q = query(collection(db, "users"), where("username", "==", u_username));
@@ -56,7 +54,7 @@ export default function signUpPage() {
             SignUp(u_email, u_username, u_password, router);
           }
           catch (e) {
-            console.error("sadsaf",e)
+            console.error(e.message)
           }
         }
         else{

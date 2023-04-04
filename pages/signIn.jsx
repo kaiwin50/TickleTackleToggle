@@ -2,7 +2,7 @@ import { Container } from "@/components/Container";
 import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
 import { Button } from "@/components/Button";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from '@/styles/Home.module.css'
 
@@ -37,7 +37,7 @@ export default function signInPage() {
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
     const { getDocs, collection, query, where, doc, setDoc, updateDoc, onSnapshot } = require("firebase/firestore");
-    const { SignIn } = require("./api/auth");
+    const { SignIn, default: auth } = require("./api/auth");
     const { db } = require("./api/firebaseSetup");
     const router = useRouter();
     async function formHandler(e) {
@@ -55,9 +55,27 @@ export default function signInPage() {
             setNotice("username or password is incorrect.");
             console.error("username or password is incorrect. :", e)
         }
-
     }
-
+    useEffect(()=>{
+        auth.onAuthStateChanged(user => {
+            if(user){
+                console.log('user: ', user)
+                onSnapshot(doc(db, 'users', user.uid), userInfo => {
+                    const data = userInfo.data();
+                    console.log(data)
+                    if(data.status == 'idle'){
+                      router.push('home');                    
+                    }
+                    else if(data.status == 'playing'){
+                      router.push(`../play/${data.inRoom}`);
+                    }
+                })
+            }
+            else{
+                console.log(null);
+            }
+        })
+    }, [])
 
     return (
         <>

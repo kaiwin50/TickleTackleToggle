@@ -4,6 +4,8 @@ import { css } from 'styled-components'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
 import Link from 'next/link'
+import { useEffect } from 'react'
+import auth, { c_user } from './api/auth'
 
 
 const style = css`
@@ -21,7 +23,9 @@ const style = css`
   }
 `
 export default function Home() {
-
+  useEffect(()=>{
+    console.log(c_user)
+  }, [])
   return (
     <>
       <Head>
