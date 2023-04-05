@@ -106,17 +106,5 @@ export class Room {
         })
         
     }
-    async destroy(rid, players, boardRef) {
-        try {
-            players.forEach(player => {
-                updateDoc(doc(db, 'users', player.id), {
-                    status: 'idle',
-                    inRoom: ''
-                })
-            })
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
+
 }
