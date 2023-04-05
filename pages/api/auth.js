@@ -24,7 +24,7 @@ export const SignUp = (email, username, password, router) => {
               title: "koy",
               point: 0
             },
-            status: "offline"
+            status: "idle"
           })
           router.push('.');
     } ).catch(e => {
