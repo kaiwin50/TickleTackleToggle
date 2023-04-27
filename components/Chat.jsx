@@ -1,23 +1,20 @@
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Box } from "./Container"
-import { dongle } from '@/components/Font'
+
 const ChatBuble = styled.div`
     width: fit-content;
     height: fit-content;
     padding: .25em;
-    font-size: 1.1em;
-    color: black;
-    background-color: white;
+    font-size: 14px;
+    color: white;
+    background-color: blueviolet;
     border-radius: .5em;
-    border: 2px solid #000000;
 `
 
 const ChatNameTag = styled.div`
     width: fit-content;
     height: fit-content;
-    color:black;
-    font-size:1.2em;
 `
 
 const ChatProfile = styled.div`
@@ -32,58 +29,19 @@ const ChatProfileImg = styled.img`
     height: 100%;
 `
 const ChatContainer = styled.div`
-    width: 22.5em;
-    height: 40%;
+    width: 25em;
+    height: 20%;
+    background-color: #5757575a;
     position: fixed;
-    background: rgba(255, 255, 255, 0.8);
-    border: 2px solid #000000;
-    box-shadow: 2px 4px 2px rgba(0, 0, 0, 0.25);
-    bottom: 21%;
+    bottom: 0;
     left: 0;
     overflow-y: auto;
     border-top-right-radius: .5em;
-    border-bottom-right-radius: .5em;
-`
-const ChatLetter = styled.div`
-    width: fit-content;
-    height: fit-content;
-    position: absolute;
-    top: 30%;
-    left: ${props => props.left};
-    overflow-y: auto;
-    font-size:6em;
-    color:#ECC94B;
-    transform:${props => props.transform};
-    text-shadow: 1px 1px 0 #000,
-        -1px 1px 0 #000,
-        1px -1px 0 #000,
-        -1px -1px 0 #000,
-        0px 1px 0 #000,
-        0px -1px 0 #000,
-        -1px 0px 0 #000,
-        1px 0px 0 #000,
-        2px 2px 0 #000,
-        -2px 2px 0 #000,
-        2px -2px 0 #000,
-        -2px -2px 0 #000,
-        0px 2px 0 #000,
-        0px -2px 0 #000,
-        -2px 0px 0 #000,
-        2px 0px 0 #000,
-        1px 2px 0 #000,
-        -1px 2px 0 #000,
-        1px -2px 0 #000,
-        -1px -2px 0 #000,
-        2px 1px 0 #000,
-        -2px 1px 0 #000,
-        2px -1px 0 #000,
-        -2px -1px 0 #000;
 `
 
 const ChatFrame = styled(Box)`
     display: flex;
     flex-direction: ${ props => props.direct || 'row'};
-    margin:1em;
 `
 const Chat = ({url, displayName, msg, direct}) => (
     <ChatFrame direct={ direct }>
@@ -91,8 +49,8 @@ const Chat = ({url, displayName, msg, direct}) => (
             <ChatProfileImg src={ url }></ChatProfileImg>
         </ChatProfile>
         <div>
-            <ChatNameTag className={dongle.className}>{ displayName }</ChatNameTag>
-            <ChatBuble className={dongle.className}>{ msg }</ChatBuble>
+            <ChatNameTag>{ displayName }</ChatNameTag>
+            <ChatBuble>{ msg }</ChatBuble>
         </div>
     </ChatFrame>
 
@@ -147,14 +105,14 @@ export const ChatApp = ( userRef, router, roomId ) => {
         <ChatContainer>
             { allMsg?.map((chat, index) => {
               return (
-              <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'Me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
+              <Chat key={index} msg={ chat.message } displayName={ userRef.username == chat.username? 'me' : chat.displayName } direct={ userRef.username == chat.username ? 'row-reverse': 'row' } url={ chat.imgUrl? chat.imgUrl : '/profile.png' }></Chat>
               )
             })}
           <form onSubmit={ handleSubmit }>
-            <input className={[dongle.className, "chat_input"].join(" ")}  ref={ dummy } name='msg' type="text" placeholder="Text Something..."  value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
+            <input ref={ dummy } name='msg' type="text" value={ msg } onChange={ (e)=>{ setMsg(e.target.value) } } />
           </form>
         </ChatContainer>
     </>
     )
 }
-export { Chat, ChatContainer, ChatLetter }
+export { Chat, ChatContainer }

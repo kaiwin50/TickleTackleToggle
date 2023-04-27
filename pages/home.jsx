@@ -6,12 +6,10 @@ import { Button } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { ChatApp,ChatLetter } from '@/components/Chat'
+import { ChatApp } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
 import auth from './api/auth'
-import { dongle } from '@/components/Font'
-import { Picture } from '@/components/Image'
 
 const style = css`
   input[name='msg']{
@@ -23,7 +21,25 @@ const style = css`
     padding: .25em;
     background-color: black;
   }
-
+  .blurBg{
+    width: 40%;
+    height: 20%;
+    background-color: #a644a6;
+    position: absolute;
+    border-radius: 50px;
+    filter: blur(150px);
+    rotate: -30deg;
+    top: 30%;
+  }
+  .blurBg2{
+    width: 40%;
+    height: 20%;
+    background-color: #df6552;
+    position: absolute;
+    border-radius: 50px;
+    filter: blur(120px);
+    right: 10%;
+  }
   /* width */
 ::-webkit-scrollbar {
   width: 20px;
@@ -49,19 +65,20 @@ const style = css`
     width: 15em;
     height: 15em;
     border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,202,65,1) 2%, rgba(221,148,0,1) 100%);
     align-items: center;
     text-align: center;
+    border: .4em solid wheat;
     position: absolute;
-    right: 10em;
+    right: 0;
     bottom: 0;
     margin: 7.5em;
-    background: #FF6839;
-    border: 2px solid #000000;
-    box-shadow: inset -5px 1px 10px 5px rgba(0, 0, 0, 0.5);
     transition: .1s;
   }
   .quick-match:hover{
-    background-color: #de3500;
+    background-color: #eecc8c;
+    background: radial-gradient(circle, #eaa700 2%, #ffaa00 100%);
+    border: .4em solid #bc8319;
     cursor: pointer;
   }
   .quick-match div{
@@ -71,73 +88,16 @@ const style = css`
     align-items: center;
     width: 100%;
     height: 100%;
-    font-size: 5em;
+    font-size: 4em;
   }
 
-  .small-btn{
+  .create-room-btn{
     width: 10em;
     height: 10em;
     margin: 2.5em;
-    right: 2em;
-    bottom : 10em;
-    border-radius: 50%;
-    align-items: center;
-    text-align: center;
-    position: absolute;
-    background: #ECD352;
-    border: 2px solid #000000;
-    box-shadow: inset -5px 1px 10px 5px rgba(0, 0, 0, 0.3);
+    right: 20em;
   }
-  .small-btn:hover{
-    background-color: #e8c305;
-    cursor: pointer;
-  }
-  .small-btn div{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    font-size: 2em;
-    color : black;
-  }
-  .rank {
-    right: 7em;
-    bottom : -1em;
-  }
-  .profileP {
-    position : absolute;
-    top : 0em;
-    left : 0em;
-    width : 22.5em;
-    height:7.5em;
-    background-color:white;
-    box-shadow: 4px 5px 4px rgba(0, 0, 0, 0.25);
-    border-bottom-right-radius: 40px;
-    color : black;
-  }
-  .profileP h1 {
-    position:absolute;
-    bottom :2em;
-    right:5em;
-  }
-  .profileP .player_status {
-    right:4.7em;
-    bottom :.5em;
-  }
-  form .chat_input {
-    width : 90%;
-    background-color:white;
-    border: 2px solid #000000;
-    left: 5%;
-    color:black;
-    font-size:1.1em;
-  }
-  .chat_input::placeholder {
-    font-size:1.1em;
-  }
-  
+
 `
 // initial room data use for escape error when some variable is unload.
 const roomInit = {
@@ -149,6 +109,9 @@ export default function Home() {
   const [uid, setUid] = useState('');
   // query url data
   const router = useRouter();
+
+
+
   // import database.
   const { db } = require('./api/firebaseSetup');
   const { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer } = require('firebase/firestore');
@@ -269,20 +232,16 @@ export default function Home() {
         <style>{style}</style>
       </Head>
       <main id='re' className={styles.main}>
-        <div className='profileP'>
-          <h1 className={dongle.className}>{userRef.username} </h1>
-          <h1 className={[dongle.className,"player_status"].join(" ")}>status </h1>
-
-        </div>
+        <div className='blurBg'></div>
+        <div className='blurBg2'></div>
+        <Container width="80%">
+          <h1>{userRef.username} </h1>
+        </Container>
         <div className='quick-match' onClick={matchingManager}>
-          <div className={dongle.className}>Match</div>
+          <div>Quick Match</div>
         </div>
-        <div className='small-btn' onClick={matchingManager}>
-          <div className={dongle.className}>Create{"\n"}Room</div>
-        </div>
-        <div className='small-btn rank' onClick={matchingManager}>
-          <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
-          <div className={dongle.className}>Rank</div>
+        <div className='quick-match create-room-btn' onClick={matchingManager}>
+          <div>create room</div>
         </div>
         <Container width="50%" visible={userRef.status == 'matching' ? 'visible' : 'hidden'}>
           Matching...<br />
@@ -295,11 +254,6 @@ export default function Home() {
         </Container>
         <Button onClick={destroyRoom}>reset</Button>
         {ChatApp(userRef, router, 'homePage')}
-        <ChatLetter className={dongle.className} left=".75em" transform="rotate(-18.73deg)">C</ChatLetter>
-        <ChatLetter className={dongle.className} left="1.25em" transform="rotate(-13.91deg)">h</ChatLetter>
-        <ChatLetter className={dongle.className} left="1.75em" transform="rotate(7.27deg)">a</ChatLetter>
-        <ChatLetter className={dongle.className} left="2.25em" transform="rotate(-8deg)">t</ChatLetter>
-        <Picture src={"/Img/chat_mouth.png"} width="4.5em" top="36%" left="16em"></Picture>
       </main>
     </>
   )
