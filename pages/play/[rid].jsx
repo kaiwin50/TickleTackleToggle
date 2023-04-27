@@ -130,6 +130,7 @@ export default function Home() {
           setUid(user.uid)
           room.subscribeUser(rid, user.uid, setPlayer);
 
+
           onSnapshot(doc(db, 'users', user.uid), userInfo => {
             setUserRef({ ...userInfo.data(), id: userInfo.id })
             const data = userInfo.data();
