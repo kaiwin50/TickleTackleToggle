@@ -26,14 +26,7 @@ const style = css`
     margin-left: 1em;
     margin-right: 1em;
   }
-  input[name='msg']{
-    width: 100%;
-    border-radius: .5em;
-    border: 1.8px solid #a644a6;
-    color: white;
-    position: sticky;
-    padding: .25em;
-  }
+
   .blurBg{
     width: 40%;
     height: 20%;

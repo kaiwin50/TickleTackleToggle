@@ -14,15 +14,14 @@ import { dongle } from '@/components/Font'
 import { Picture } from '@/components/Image'
 
 const style = css`
-  input[name='msg']{
+  /* input[name='msg']{
     width: 100%;
-    border-radius: .5em;
     border: 1.8px solid #a644a6;
     color: white;
     position: sticky;
     padding: .25em;
     background-color: black;
-  }
+  } */
 
   /* width */
 ::-webkit-scrollbar {
@@ -126,7 +125,7 @@ const style = css`
     right:4.7em;
     bottom :.5em;
   }
-  form .chat_input {
+  /* form .chat_input {
     width : 90%;
     background-color:white;
     border: 2px solid #000000;
@@ -136,7 +135,7 @@ const style = css`
   }
   .chat_input::placeholder {
     font-size:1.1em;
-  }
+  } */
   
 `
 // initial room data use for escape error when some variable is unload.
