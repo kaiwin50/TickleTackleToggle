@@ -4,16 +4,16 @@ const inputFormula = ( props ) => (
     <input  { ...props }></input>
 );
 const StyledInput = styled(inputFormula)`
-    width: ${ props => props.width || "20em" };
+    width: ${ props => props.width || "22.5vw" };
     height: ${ props => props.height || "3em" };
     border-radius: 1em;
-    background-color: transparent;
+    background-color: white;
     padding: 1em 1em;
     outline: none;
     border: 1.8px solid currentColor;
     box-sizing: border-box;
     position: relative;
-    color: goldenrod;
+    color: black;
     
     &~label::before, &~label::after{
         content: "";
@@ -34,11 +34,11 @@ const StyledInput = styled(inputFormula)`
     }
     &:placeholder-shown, &:placeholder-shown~label{
         position: relative;
-        color: #ffffff50;
+        color: #6967DA;
     }
     &:placeholder-shown~label{
         position: absolute;
-        top: .75em;
+        top: .5em;
     }
     &:placeholder-shown~label::before{
         display: none;
@@ -49,21 +49,21 @@ const StyledInput = styled(inputFormula)`
         display: none;
     }
     &:focus, &:focus~label, &~label{
-        color: goldenrod;
+        color: black;
     }
     &:focus~label, &~label{
         position: absolute;
-        top: -.3em;
+        top: -1.2em;
         left: .75em;
         transition: .5s;
         padding: 0 2em;
         border-radius: 20px;
         user-select: none;
         pointer-events: none;
-        background-color: #3e2b85;
+        background-color: transparent;
     }
     &:valid, &:valid~label{
-        color: #63ef63;
+        color: #039c2a;
     }
     &:focus~label::before, &:valid~label::before, &:focus~label::after, &:valid~label::after{
         display: block;

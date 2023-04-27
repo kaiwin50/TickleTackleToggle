@@ -1,10 +1,12 @@
 import { Container } from "@/components/Container";
 import { StyledInput } from "@/components/inputBar";
 import { css } from "styled-components";
-import { Button } from "@/components/Button";
+import { Button, CloseBtn } from "@/components/Button";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from '@/styles/Home.module.css'
+import { heyComic, dongle } from "@/components/Font";
+import Link from 'next/link'
 
 const style = css`
     div{
@@ -16,9 +18,10 @@ const style = css`
         margin: 2em;
     }
     h1{
-        position: absolute;
-        top: -.65em;
-        color: white;
+        color: black;
+        width: 100%;
+        justify-content: center;
+        display: flex;
     }
     .right{
         margin: 1em auto;
@@ -28,6 +31,34 @@ const style = css`
         color: red;
         font-size: .75em;
         display: block;
+    }
+    .title {
+        color: #EDCE29;
+        font-size : 5em;
+        text-shadow: 1.5px 1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px -1.5px 0 #000,
+        0px 1.5px 0 #000,
+        0px -1.5px 0 #000,
+        -1.5px 0px 0 #000,
+        1.5px 0px 0 #000,
+        3px 3px 0 #000,
+        -3px 3px 0 #000,
+        3px -3px 0 #000,
+        -3px -3px 0 #000,
+        0px 3px 0 #000,
+        0px -3px 0 #000,
+        -3px 0px 0 #000,
+        3px 0px 0 #000,
+        1.5px 3px 0 #000,
+        -1.5px 3px 0 #000,
+        1.5px -3px 0 #000,
+        -1.5px -3px 0 #000,
+        3px 1.5px 0 #000,
+        -3px 1.5px 0 #000,
+        3px -1.5px 0 #000,
+        -3px -1.5px 0 #000, 0px 10.5px 6px rgba(0, 0, 0, 0.6);
     }
 `
 export const ContextAuth = createContext()
@@ -82,8 +113,10 @@ export default function signInPage() {
             <style>{style}</style>
             <main className={styles.main}>
                 <ContextAuth.Provider value={u_username}>
-                    <Container>
-                        <h1>Sign In {u_username} </h1>
+                    <h2 className={[heyComic.className, "title"].join(" ")}>Tickle Tackle Toggle</h2>
+                    <Container color="#F76363" border="3px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)" className={dongle.className}> 
+                        <h1>LOG IN {u_username} </h1>
+                        <Link href='./'><CloseBtn className={dongle.className}>x</CloseBtn></Link>
                         <form onSubmit={formHandler}>
                             <div className="inputBox">
                                 <StyledInput type="text" name="username" id="username" onChange={(e) => (setUsername(e.target.value))} placeholder=" " required></StyledInput>
@@ -93,7 +126,7 @@ export default function signInPage() {
                                 <StyledInput type="password" name="password" id="password" onChange={(e) => (setPassword(e.target.value))} placeholder=" " required></StyledInput>
                                 <label>Password</label>
                             </div>
-                            <div className="inputBox right" ><Button type="submit">sign up</Button></div>
+                            <div className="inputBox right" ><Button type="submit" fontsize="1.3em"  className={dongle.className} fontcolor="black">Log In</Button></div>
                             <small>{notice}</small>
                         </form>
                     </Container>
