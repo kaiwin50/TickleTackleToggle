@@ -47,31 +47,31 @@ export class Room {
         }
         if (setPlayers) {
             onSnapshot(collection(doc(db, 'room', rid), 'players'), async (snapshot) => {
-                try{
+                try {
                     const qReady = query(collection(doc(db, 'room', rid), 'players'), where('isReady', '==', true));
-                const playersReady = await getCountFromServer(qReady)
-                console.log('ready: ', playersReady.data().count)
-                const isBothReady = playersReady.data().count == 2;
-                setPlayers([])
-                snapshot.docs.forEach(playerDoc => {
-                    setPlayers(old => ([...old, playerDoc]))
-                    if (isBothReady) {
-                        console.log('isBothReady: ', isBothReady)
-                        updateDoc(doc(doc(db, 'room', rid), 'players', playerDoc.id), {
-                            isReady: false
-                        })
-                        updateDoc(doc(db, 'users', playerDoc.id), {
-                            status: 'playing'
-                        })
-                        updateDoc(doc(db, 'room', rid), {
-                            status: 'playing'
-                        })
-                        this.start(rid, snapshot)
+                    const playersReady = await getCountFromServer(qReady)
+                    console.log('ready: ', playersReady.data().count)
+                    const isBothReady = playersReady.data().count == 2;
+                    setPlayers([])
+                    snapshot.docs.forEach(playerDoc => {
+                        setPlayers(old => ([...old, playerDoc]))
+                        if (isBothReady) {
+                            console.log('isBothReady: ', isBothReady)
+                            updateDoc(doc(doc(db, 'room', rid), 'players', playerDoc.id), {
+                                isReady: false
+                            })
+                            updateDoc(doc(db, 'users', playerDoc.id), {
+                                status: 'playing'
+                            })
+                            updateDoc(doc(db, 'room', rid), {
+                                status: 'playing'
+                            })
+                            this.start(rid, snapshot)
 
-                    }
-                })
+                        }
+                    })
                 }
-                catch(e){
+                catch (e) {
                     console.error('room deleted');
                 }
             })
@@ -100,11 +100,19 @@ export class Room {
             })
         })
     }
-    subscribeUser(rid, uid, setter){
+    subscribeUser(rid, uid, setter) {
         onSnapshot(doc(doc(db, 'room', rid), 'players', uid), snapshot => {
             setter(snapshot.data());
         })
-        
-    }
 
+    }
+    destroy(rid, players) {
+        deleteDoc(doc(db, 'room', rid));
+        players.forEach(player => {
+            deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
+            updateDoc(doc(db, 'users', player.id), {
+                status: 'idle'
+            })
+        })
+    }
 }
