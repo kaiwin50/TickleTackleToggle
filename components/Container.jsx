@@ -14,9 +14,13 @@ const Container = styled(Box)`
   align-items: center;
   width: ${props => props.width || "fit-content"};
   height: ${props => props.height || "fit-content"};
-  padding: 1em;
-  border-radius: 1em;
+  padding: ${props => props.padding || "1em"};
+  border-radius: ${props => props.bdradius || "1em"};
   position: relative;
+  border: ${props => props.border};
+  box-shadow: ${props => props.shadow};
+  display: flex;
+  flex-wrap: wrap;
   visibility: ${ props => props.visible || 'visible'};
 `
 

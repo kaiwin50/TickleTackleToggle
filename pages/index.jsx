@@ -2,10 +2,12 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
+import { Background } from '@/components/Image'
+import { Button, LoginBtn, SignUpBtn } from '@/components/Button'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import auth, { c_user } from './api/auth'
+import { dongle } from '@/components/Font'
 
 
 const style = css`
@@ -36,12 +38,18 @@ export default function Home() {
         <style>{ style }</style>
       </Head>
       <main className={styles.main}>
-        <Container width="80%">
-          <ul>
-            <li><Link href='./signIn'><Button>Sign In</Button></Link></li>
-            <li><Link href='./signUp'><Button>sign up</Button></Link></li>
-          </ul>
+        <Container width="100vw" bdradius="0%" color="#8B89F7" >
+          <Container width="100%" color="#8B89F7">
+            
+          </Container>
+          <Container width="50%" color="#8B89F7">
+            <ul>
+              <li><Link href='./signIn'><LoginBtn className={dongle.className}>LOG IN</LoginBtn></Link></li>
+              <li><Link href='./signUp'><SignUpBtn className={dongle.className}>REGISTER</SignUpBtn></Link></li>
+            </ul>
+          </Container>
         </Container>
+        
 
         
       </main>
