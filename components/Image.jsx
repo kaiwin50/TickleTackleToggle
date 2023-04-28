@@ -9,15 +9,12 @@ const Image = ({ className, children, props, src }) => (
   
 
 const Background = styled(Image)`
-  justify-self: center;
-  align-items: center;
-  width: ${props => props.width || "fit-content"};
-  height: ${props => props.height || "fit-content"};
-  padding: 1em;
-  position: relative;
-  visibility: ${ props => props.visible || 'visible'};
-`
+  position : absolute;
+  width: 100%;
+  height: 100%;
 
+`
+  /* visibility: ${ props => props.visible || 'visible'}; */
 const Picture = styled(Image)`
   width: ${props => props.width || "fit-content"};
   height: ${props => props.height || "fit-content"};

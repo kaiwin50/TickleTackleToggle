@@ -115,7 +115,8 @@ export class Room {
     destroy(rid, players) {
         players.forEach((player) => {
             updateDoc(doc(db, 'users', player.id), {
-                status: 'idle'
+                status: 'idle',
+                inRoom: ''
             }).then(() => {
                 deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
             })
