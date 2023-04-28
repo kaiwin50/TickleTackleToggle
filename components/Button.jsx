@@ -21,7 +21,7 @@ const Button = styled(Btn)`
     top: 2px;
     filter: drop-shadow(0 3px #8b6912);
   }
-  
+  visibility: ${ props => props.visible || 'visible'};
 `
 const LoginBtn = styled(Btn)`
 position: relative;

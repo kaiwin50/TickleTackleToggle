@@ -1,17 +1,18 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
-import { Container } from '@/components/Container'
+import { Container,ContainerFluid } from '@/components/Container'
 import { Button } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-
+import { ProgressBar } from  'react-loader-spinner'
 import { ChatApp,ChatLetter } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
 import auth from './api/auth'
-import { dongle } from '@/components/Font'
-import { Picture } from '@/components/Image'
+import { dongle, heyComic } from '@/components/Font'
+import { Picture,Background } from '@/components/Image'
+import match_bg from '../public/Img/match_bg.png'
 
 const style = css`
   input[name='msg']{
@@ -126,6 +127,58 @@ const style = css`
     right:4.7em;
     bottom :.5em;
   }
+  .leader-btn {
+    position : absolute;
+    top : 8em;
+    right : 0em;
+    width : 20em;
+    height:4em;
+    background: #ECC94B;
+    box-shadow: 0px 6px 4px rgba(0, 0, 0, 0.25);  
+    border-bottom-left-radius: 50px;
+    border-top-left-radius: 50px;
+    color : black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .leader-btn h1 {
+    width:100%;
+    display:flex;
+    justify-content:end;
+    margin-right:1.5em;
+    font-size:2.5em;
+  }
+  .leader-btn:hover{
+    background-color: #e8c305;
+    cursor: pointer;
+  }
+  .friend-btn {
+    position : absolute;
+    bottom : 0em;
+    left : 0em;
+    width : 25em;
+    height:4em;
+    background: #ECC94B;
+    box-shadow: 8px 6px 4px rgba(0, 0, 0, 0.25);
+    border-top-right-radius: 30px;
+    color : black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .friend-btn h1 {
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:2.5em;
+  }
+  .friend-btn:hover{
+    background-color: #e8c305;
+    cursor: pointer;
+  }
+  
   form .chat_input {
     width : 90%;
     background-color:white;
@@ -136,6 +189,14 @@ const style = css`
   }
   .chat_input::placeholder {
     font-size:1.1em;
+  }
+  .matching h1{
+    color: black;
+    width: 100%;
+    text-align:center;
+    font-size:4em;
+    visibility: ${ props => props.visible || 'visible'};
+    z-index: 2;
   }
   
 `
@@ -270,6 +331,7 @@ export default function Home() {
       </Head>
       <main id='re' className={styles.main}>
         <div className='profileP'>
+          <div className='profileImg'></div>
           <h1 className={dongle.className}>{userRef.username} </h1>
           <h1 className={[dongle.className,"player_status"].join(" ")}>status </h1>
 
@@ -284,15 +346,15 @@ export default function Home() {
           <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
           <div className={dongle.className}>Rank</div>
         </div>
-        <Container width="50%" visible={userRef.status == 'matching' ? 'visible' : 'hidden'}>
-          Matching...<br />
-          <Container visible={players[0] != undefined ? 'visble' : 'hidden'}> {userRef.inRoom != '' ? players[0]?.data().username : null}
-          </Container>
-          <Container visible={players[1] != undefined ? 'visible' : 'hidden'}> {userRef.inRoom != '' ? players[1]?.data().username : null}
-          </Container>
-          <Button onClick={userReady}>Ready</Button>
-          <Button onClick={destroyRoom}>Cancel</Button>
-        </Container>
+        <div className='leader-btn'>
+          <Picture src={"/Img/hand1.png"} width="3.5em" top=".1em" left="2em"></Picture>
+          <h1 className={dongle.className}>Leader Board</h1>
+        </div>
+        <div className='friend-btn'>
+          <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>
+          <h1 className={dongle.className}>Friends</h1>
+        </div>
+        
         <Button onClick={destroyRoom}>reset</Button>
         {ChatApp(userRef, router, 'homePage')}
         <ChatLetter className={dongle.className} left=".75em" transform="rotate(-18.73deg)">C</ChatLetter>
@@ -300,6 +362,25 @@ export default function Home() {
         <ChatLetter className={dongle.className} left="1.75em" transform="rotate(7.27deg)">a</ChatLetter>
         <ChatLetter className={dongle.className} left="2.25em" transform="rotate(-8deg)">t</ChatLetter>
         <Picture src={"/Img/chat_mouth.png"} width="4.5em" top="36%" left="16em"></Picture>
+
+        <ContainerFluid className="matching" width="100vw" height="100vh" visible={userRef.status == 'matching' ? 'visible' : 'hidden'}>
+          <Background visible={players[0] != undefined ? 'visble' : 'hidden'} src={"/Img/match_bg.png"}></Background>
+          <h1 visible={players[0] != undefined ? 'visble' : 'hidden'} className={heyComic.className}>Matching...</h1>
+
+          <Container color="transparent" visible={players[0] != undefined ? 'visble' : 'hidden'} width="40%" padding="0em" height="60%"> 
+          <Container visible={players[0] != undefined ? 'visble' : 'hidden'} width="50%" height="100%" color="green" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+            Player 1 : {userRef.inRoom != '' ? players[0]?.data().username : null}</Container>
+          </Container>
+
+          <Container color="transparent" visible={players[0] != undefined ? 'visble' : 'hidden'} width="20%"> {userRef.inRoom != '' ? players[0]?.data().username : null}
+          </Container>
+          <Container color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
+          <Container visible={players[1] != undefined ? 'visble' : 'hidden'} width="50%" height="100%" color="purple" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+            Player 2 : {userRef.inRoom != '' ? players[1]?.data().username : null}</Container>
+          </Container>
+          <Button  onClick={userReady} visible={players[1] != undefined ? 'visible' : 'hidden'}>Ready </Button>
+          <Button onClick={destroyRoom} visible={players[0] != undefined ? 'visble' : 'hidden'}>Cancel</Button>
+        </ContainerFluid>
       </main>
     </>
   )
