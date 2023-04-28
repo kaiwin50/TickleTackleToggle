@@ -9,7 +9,7 @@ const Box = ({ className, children, props }) => (
   
 
 const Container = styled(Box)`
-  background-color: ${props => props.color || "#3e2b85"};;
+  background-color: ${props => props.color || "#3e2b85"};
   justify-content: center;
   align-items: center;
   width: ${props => props.width || "fit-content"};
@@ -22,6 +22,25 @@ const Container = styled(Box)`
   display: flex;
   flex-wrap: wrap;
   visibility: ${ props => props.visible || 'visible'};
+  z-index: ${props => props.zindex};
 `
 
-export { Container, Box }
+const ContainerFluid = styled(Box)`
+  background-color: ${props => props.color || "#ECD352"};
+  justify-content: center;
+  align-items: center;
+  width: ${props => props.width || "100%"};
+  height: ${props => props.height || "100%"};
+  padding: ${props => props.padding || "1em"};
+  border-radius: ${props => props.bdradius};
+  position: absolute;
+  top:0;
+  left:0;
+  border: ${props => props.border};
+  box-shadow: ${props => props.shadow};
+  display: flex;
+  flex-wrap: wrap;
+  visibility: ${ props => props.visible || 'visible'};
+`
+
+export { Container, Box, ContainerFluid }

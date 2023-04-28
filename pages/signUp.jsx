@@ -9,10 +9,12 @@ import Head from "next/head";
 import { heyComic, dongle } from "@/components/Font";
 import Link from 'next/link'
 import { Picture } from '@/components/Image'
+import texture1 from '../public/Img/bg_texture1.png'
 const style = css`
 
     div{
     }
+    
     .inputBox{
         width: fit-content;
         height: fit-content;
@@ -78,7 +80,12 @@ export default function signUpPage() {
         <link rel="icon" href="/favicon.ico" />
         <style>{ style }</style>
       </Head>
-      <main className={styles.main} >
+      <main className={styles.main} style={{
+      backgroundImage: `url(${texture1.src})`,
+      height: '100vh',
+      backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    }}>
                 <Container color="#ECD352" border="4px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)" width="40%" className={dongle.className}>
                     <h2 className={heyComic.className}>Create New Account</h2>
                     <Link href='./'><CloseBtn className={dongle.className}>x</CloseBtn></Link>
