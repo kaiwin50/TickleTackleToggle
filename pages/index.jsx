@@ -38,11 +38,11 @@ export default function Home() {
         <style>{ style }</style>
       </Head>
       <main className={styles.main}>
-        <Container width="100vw" bdradius="0%" color="#8B89F7" >
-          <Container width="100%" color="#8B89F7">
+        <Container width="100vw" bdradius="0%" color="transparent" >
+          <Container width="100%" color="transparent">
             
           </Container>
-          <Container width="50%" color="#8B89F7">
+          <Container width="50%" color="transparent">
             <ul>
               <li><Link href='./signIn'><LoginBtn className={dongle.className}>LOG IN</LoginBtn></Link></li>
               <li><Link href='./signUp'><SignUpBtn className={dongle.className}>REGISTER</SignUpBtn></Link></li>
