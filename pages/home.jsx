@@ -6,7 +6,7 @@ import { Button } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { ChatApp,ChatLetter } from '@/components/Chat'
+import { ChatApp, ChatLetter } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
 import auth from './api/auth'
@@ -19,7 +19,6 @@ const style = css`
     border: 1.8px solid #a644a6;
     color: white;
     position: sticky;
-    padding: .25em;
     background-color: black;
   } */
 
@@ -166,9 +165,14 @@ export default function Home() {
           console.log('user: ', user)
           setUid(user.uid)
           onSnapshot(doc(db, 'users', user.uid), userInfo => {
-            setUserRef({...userInfo.data(), id: userInfo.id})
+            setUserRef({ ...userInfo.data(), id: userInfo.id })
             const data = userInfo.data();
             console.log(data)
+            if (data.inRoom != '') {
+              console.log('is in room ', data.inRoom)
+              room.subscribe(data.inRoom, setRoomRef, setPlayers);
+              console.log(roomRef, players)
+            }
             if (data.status == 'idle') {
               router.push('home');
             }
@@ -270,7 +274,7 @@ export default function Home() {
       <main id='re' className={styles.main}>
         <div className='profileP'>
           <h1 className={dongle.className}>{userRef.username} </h1>
-          <h1 className={[dongle.className,"player_status"].join(" ")}>status </h1>
+          <h1 className={[dongle.className, "player_status"].join(" ")}>status </h1>
 
         </div>
         <div className='quick-match' onClick={matchingManager}>

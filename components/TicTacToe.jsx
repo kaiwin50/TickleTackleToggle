@@ -89,13 +89,8 @@ function TicTacToe(rid, player, router) {
     }
 
     const endPlay = async ()=>{
-        players.forEach(player => {
-            updateDoc(doc(db, 'users', player.id), {
-                status: 'idle',
-                inRoom: ''
-            })
-        })
-        router.replace(`../../home`)
+        room.destroy(rid, players);
+        router.push('../home')
       }
 
     const [roomRef, setRoomRef] = useState([]);
