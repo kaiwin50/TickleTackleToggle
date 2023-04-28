@@ -412,16 +412,16 @@ export default function Home() {
             <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
           </Container>
 
-          <Container color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="20%"> 
-            <Picture src={"/Img/vs.png"} visible={players[1] != undefined ? 'visible' : 'hidden'} width="10em" top="-2em" left="4em" transform="rotate(12.1deg)"></Picture>
+          <Container color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="20%"> 
+            <Picture src={"/Img/vs.png"} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="10em" top="-2em" left="4em" transform="rotate(12.1deg)"></Picture>
           </Container>
           
-          <Container zindex="3" color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
-            <Container className={dongle.className} visible={players[1] != undefined ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+          <Container zindex="3" color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
+            <Container className={dongle.className} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
             <h2 className="player_match_label"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
           </Container>
-          <Button  onClick={userReady} visible={players[1] != undefined ? 'visible' : 'hidden'}>Ready </Button>
-          <Button onClick={destroyRoom} visible={players[0] != undefined ? 'visible' : 'hidden'}>Cancel</Button>
+          <Button  onClick={userReady}>Ready </Button>
+          <Button onClick={destroyRoom}>Cancel</Button>
         </ContainerFluid>
       </main>
     </>
