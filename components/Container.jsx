@@ -22,6 +22,7 @@ const Container = styled(Box)`
   display: flex;
   flex-wrap: wrap;
   visibility: ${ props => props.visible || 'visible'};
+  z-index: ${props => props.zindex};
 `
 
 const ContainerFluid = styled(Box)`

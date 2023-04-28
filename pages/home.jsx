@@ -191,12 +191,59 @@ const style = css`
     font-size:1.1em;
   }
   .matching h1{
-    color: black;
-    width: 100%;
-    text-align:center;
+    color: white;
+    width: 40%;
+    right:0;
+    top:40%;
     font-size:4em;
     visibility: ${ props => props.visible || 'visible'};
+    position:absolute;
     z-index: 2;
+    font-size : 5em;
+    text-shadow: 1.5px 1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px -1.5px 0 #000,
+        0px 1.5px 0 #000,
+        0px -1.5px 0 #000,
+        -1.5px 0px 0 #000,
+        1.5px 0px 0 #000,
+        3px 3px 0 #000,
+        -3px 3px 0 #000,
+        3px -3px 0 #000,
+        -3px -3px 0 #000,
+        0px 3px 0 #000,
+        0px -3px 0 #000,
+        -3px 0px 0 #000,
+        3px 0px 0 #000,
+        1.5px 3px 0 #000,
+        -1.5px 3px 0 #000,
+        1.5px -3px 0 #000,
+        -1.5px -3px 0 #000,
+        3px 1.5px 0 #000,
+        -3px 1.5px 0 #000,
+        3px -1.5px 0 #000,
+        -3px -1.5px 0 #000, 6px 9px 4px rgba(0, 0, 0, 0.3);
+  }
+  .player_match_label{
+    color:#FF6839;
+    font-size:3em;
+    height:0em;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+  }
+  .player_match_label p {
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    height:1em;
+  }
+  .player_match_name {
+    font-size:.75em;
   }
   
 `
@@ -364,22 +411,24 @@ export default function Home() {
         <Picture src={"/Img/chat_mouth.png"} width="4.5em" top="36%" left="16em"></Picture>
 
         <ContainerFluid className="matching" width="100vw" height="100vh" visible={userRef.status == 'matching' ? 'visible' : 'hidden'}>
-          <Background visible={players[0] != undefined ? 'visble' : 'hidden'} src={"/Img/match_bg.png"}></Background>
-          <h1 visible={players[0] != undefined ? 'visble' : 'hidden'} className={heyComic.className}>Matching...</h1>
+          <Background visible={players[0] != undefined ? 'visible' : 'hidden'} src={"/Img/match_bg.png"}></Background>
+          <h1 visible={players[0] != undefined ? 'hidden' : 'visible'} className={dongle.className}>Matching...</h1>
 
-          <Container color="transparent" visible={players[0] != undefined ? 'visble' : 'hidden'} width="40%" padding="0em" height="60%"> 
-          <Container visible={players[0] != undefined ? 'visble' : 'hidden'} width="50%" height="100%" color="green" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-            Player 1 : {userRef.inRoom != '' ? players[0]?.data().username : null}</Container>
+          <Container color="transparent" visible={players[0] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%"> 
+          <Container className={dongle.className} visible={players[0] != undefined ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+            <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
           </Container>
 
-          <Container color="transparent" visible={players[0] != undefined ? 'visble' : 'hidden'} width="20%"> {userRef.inRoom != '' ? players[0]?.data().username : null}
+          <Container color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="20%"> 
+            <Picture src={"/Img/vs.png"} visible={players[1] != undefined ? 'visible' : 'hidden'} width="10em" top="-2em" left="4em" transform="rotate(12.1deg)"></Picture>
           </Container>
-          <Container color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
-          <Container visible={players[1] != undefined ? 'visble' : 'hidden'} width="50%" height="100%" color="purple" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-            Player 2 : {userRef.inRoom != '' ? players[1]?.data().username : null}</Container>
+          
+          <Container zindex="3" color="transparent" visible={players[1] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
+            <Container className={dongle.className} visible={players[1] != undefined ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+            <h2 className="player_match_label"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
           </Container>
           <Button  onClick={userReady} visible={players[1] != undefined ? 'visible' : 'hidden'}>Ready </Button>
-          <Button onClick={destroyRoom} visible={players[0] != undefined ? 'visble' : 'hidden'}>Cancel</Button>
+          <Button onClick={destroyRoom} visible={players[0] != undefined ? 'visible' : 'hidden'}>Cancel</Button>
         </ContainerFluid>
       </main>
     </>
