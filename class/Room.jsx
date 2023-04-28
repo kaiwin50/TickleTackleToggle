@@ -38,9 +38,15 @@ export class Room {
                 setter({ ...snapshot.data(), id: snapshot.id })
                 const q = query(collection(doc(db, 'room', rid), 'players'))
                 const playersNum = await getCountFromServer(q)
+                console.log(playersNum.data().count)
                 if (playersNum.data().count == 2) {
                     updateDoc(doc(db, 'room', rid), {
                         isFull: true
+                    })
+                }
+                else if(playersNum.data().count < 2){
+                    updateDoc(doc(db, 'room', rid), {
+                        isFull: false
                     })
                 }
             })
@@ -50,7 +56,7 @@ export class Room {
                 try {
                     const qReady = query(collection(doc(db, 'room', rid), 'players'), where('isReady', '==', true));
                     const playersReady = await getCountFromServer(qReady)
-                    console.log('ready: ', playersReady.data().count)
+                    console.log('ready: ', playersReady.data().count, rid)
                     const isBothReady = playersReady.data().count == 2;
                     setPlayers([])
                     snapshot.docs.forEach(playerDoc => {
@@ -107,16 +113,14 @@ export class Room {
 
     }
     destroy(rid, players) {
-
         players.forEach((player) => {
             updateDoc(doc(db, 'users', player.id), {
                 status: 'idle'
             }).then(() => {
                 deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
-            }).then(() => {
-                updateDoc(doc(db, 'room', rid), {
-                    isFull: false
-                })
+            })
+            updateDoc(doc(db, 'room', rid), {
+                isFull: false
             })
         })
     }
