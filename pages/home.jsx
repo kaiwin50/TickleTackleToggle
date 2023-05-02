@@ -409,7 +409,7 @@ export default function Home() {
       }}>
         <div className='profileP'>
           <div className='profileImg'></div>
-          <h1 className={dongle.className}>{userRef.username} </h1>
+          <h1 className={dongle.className} style={{ fontSize: '16px' }}>{userRef.username} </h1>
           <h1 className={[dongle.className, "player_status"].join(" ")}>status </h1>
 
         </div>

@@ -145,7 +145,7 @@ export default function Home() {
               router.push('home');
             }
             else if (data.status == 'playing') {
-              router.push(`../../play/${data.inRoom}`);
+              router.push(`/play/${data.inRoom}`);
             }
           })
         }

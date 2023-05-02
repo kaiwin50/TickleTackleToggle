@@ -9,7 +9,7 @@ import { css } from 'styled-components'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, PictureFlex } from '@/components/Image'
 import { db } from "@/config/firebaseSetup";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
 const style = css`
     .turnLabel {
         border-bottom-left-radius: 50px;
@@ -105,8 +105,6 @@ const PlayerHand = styled.ul`
 
 
 
-const { db } = require('@/config/firebaseSetup');
-const { doc, updateDoc, getDoc, collection, getDocs, deleteDoc } = require('firebase/firestore');
 
 function TicTacToe(rid, player = { card: [] }, router) {
     const table = [
@@ -248,11 +246,11 @@ function TicTacToe(rid, player = { card: [] }, router) {
 
     const surrender = async () => {
         room.surrender(rid, player);
-        router.replace('../home')
+        router.replace('/home')
     }
     const endPlay = async () => {
         room.destroy(rid, player);
-        router.replace('../home')
+        router.replace('/home')
     }
     const deactivate = () => {
         updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {

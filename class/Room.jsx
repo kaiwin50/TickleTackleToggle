@@ -75,7 +75,7 @@ export class Room {
                     snapshot.docs.forEach(playerDoc => {
                         setPlayers(old => ([...old, playerDoc]))
                         if (isBothReady) {
-                            console.log('isBothReady: ', isBothReady)
+                            this.start(rid, snapshot)
                             updateDoc(doc(doc(db, 'room', rid), 'players', playerDoc.id), {
                                 isReady: false
                             })
@@ -85,7 +85,6 @@ export class Room {
                             updateDoc(doc(db, 'room', rid), {
                                 status: 'playing'
                             })
-                            this.start(rid, snapshot)
 
                         }
                     })

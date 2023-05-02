@@ -1,16 +1,51 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import auth, { c_user } from './api/auth'
-import { dongle,heyComic } from '@/components/Font'
+import { dongle, heyComic } from '@/components/Font'
 import { Flex, Text, Img, Button, Box } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
+import { addDoc, collection, doc, getCountFromServer, getDocs, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore'
+import { db } from '@/config/firebaseSetup'
+import { Room } from '@/class/Room'
+
+const roomInit = {
+  status: 'waiting for matching.', player1: { username: 'none', uid: '' }, player2: { username: 'none', uid: '' }
+}
 
 export default function Rank() {
   const router = useRouter();
-  
-  useEffect(()=>{
-    console.log(c_user)
+
+  const [roomRef, setRoomRef] = useState(roomInit)
+
+  const [userRef, setUserRef] = useState({})
+  const room = new Room();
+
+  const start = async () => {
+    const q = query(collection(db, 'rank'), where('title', '==', userRef.rank.title), where('isFull', '==', 'false'))
+    const qCount = await getCountFromServer(q);
+    if(qCount.data().count > 0) { 
+      const qDocs = await getDocs(q);
+      room.addPlayer(doc(db, 'rank', qDocs.docs[0].id));
+    }
+    else{
+      addDoc(collection(db, 'rank'), {
+        title: userRef.rank.title,
+        isFull: 'false',
+        createTime: serverTimestamp()
+      })
+    }
+  }
+
+  useEffect(() => {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log('user: ', user)
+        onSnapshot(doc(db, 'users', user.uid), userInfo => {
+          setUserRef({ ...userInfo.data(), id: userInfo.id })
+        })
+      }
+    })
   }, [])
   return (
     <>
