@@ -103,7 +103,7 @@ const PlayerHand = styled.ul`
 
 
 
-const { db } = require('@/pages/api/firebaseSetup');
+const { db } = require('@/config/firebaseSetup');
 const { doc, updateDoc, getDoc, collection, getDocs, deleteDoc } = require('firebase/firestore');
 
 function TicTacToe(rid, player = { card: [] }, router) {

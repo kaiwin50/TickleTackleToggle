@@ -70,7 +70,7 @@ export default function signInPage() {
     const [notice, setNotice] = useState("");
     const { getDocs, collection, query, where, doc, setDoc, updateDoc, onSnapshot } = require("firebase/firestore");
     const { SignIn, default: auth } = require("./api/auth");
-    const { db } = require("./api/firebaseSetup");
+    const { db } = require("../config/firebaseSetup");
     const router = useRouter();
     async function formHandler(e) {
         e.preventDefault();

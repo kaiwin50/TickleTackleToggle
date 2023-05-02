@@ -50,7 +50,7 @@ export default function signUpPage() {
     const router = useRouter();
 
     const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
-    const { db } = require("./api/firebaseSetup")
+    const { db } = require("../config/firebaseSetup")
     const { SignUp } = require('./api/auth');
 
     async function formHandler (e) {

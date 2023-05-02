@@ -1,5 +1,5 @@
 const { setDoc, doc, addDoc, collection, serverTimestamp, updateDoc, onSnapshot, deleteDoc, getDocs, query, getCountFromServer, where } = require("firebase/firestore")
-const { db } = require("@/pages/api/firebaseSetup");
+const { db } = require("@/config/firebaseSetup");
 
 export class Room {
     constructor() {

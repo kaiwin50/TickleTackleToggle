@@ -249,7 +249,7 @@ export default function Home() {
   // query url data
   const router = useRouter();
   // import database.
-  const { db } = require('./api/firebaseSetup');
+  const { db } = require('../config/firebaseSetup');
   const { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer } = require('firebase/firestore');
   // user refference : use as refference of realtime update user info.
   const [userRef, setUserRef] = useState({})
@@ -396,7 +396,7 @@ export default function Home() {
         </div></Link>
         <Link href='/leaderboard'><div className='leader-btn'>
           <Picture src={"/Img/hand1.png"} width="3.5em" top=".1em" left="2em"></Picture>
-          <h1 className={dongle.className}>Leader Board</h1>
+          <h1 className={dongle.className}>Leaderboard</h1>
         </div></Link>
         <Link href='/friends'><div className='friend-btn'>
           <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>

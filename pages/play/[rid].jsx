@@ -160,7 +160,7 @@ export default function Home() {
 
 
   // import database
-  const { db } = require('../api/firebaseSetup');
+  const { db } = require('../../config/firebaseSetup');
   const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer, deleteDoc } = require('firebase/firestore');
 
   // fetch user data
