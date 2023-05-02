@@ -1,18 +1,21 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
-import { Container,ContainerFluid } from '@/components/Container'
-import { Button } from '@/components/Button'
+import { Container, ContainerFluid } from '@/components/Container'
+// import { Button } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { ChatApp,ChatLetter } from '@/components/Chat'
+import { ChatApp, ChatLetter } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
 import auth from './api/auth'
 import { dongle, heyComic } from '@/components/Font'
-import { Picture,Background,PictureFlex } from '@/components/Image'
+import { Picture, Background, PictureFlex } from '@/components/Image'
 import Link from 'next/link'
 import texture1 from '../public/Img/bg_texture1.png'
+import { db } from '@/config/firebaseSetup'
+import { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer, deleteDoc } from 'firebase/firestore'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, useDisclosure } from '@chakra-ui/react'
 
 const style = css`
   /* input[name='msg']{
@@ -184,7 +187,7 @@ const style = css`
     right:17.5%;
     top:20%;
     font-size:4em;
-    visibility: ${ props => props.visible || 'visible'};
+    visibility: ${props => props.visible || 'visible'};
     position:absolute;
     z-index: 2;
     font-size : 5em;
@@ -248,11 +251,11 @@ export default function Home() {
   const [uid, setUid] = useState('');
   // query url data
   const router = useRouter();
-  // import database.
-  const { db } = require('../config/firebaseSetup');
-  const { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer } = require('firebase/firestore');
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   // user refference : use as refference of realtime update user info.
   const [userRef, setUserRef] = useState({})
+  const [inviteRef, setInviteRef] = useState([])
   const user = new User();
   // condition on load: use for escape from error when uid is unreaded.
   useEffect(() => {
@@ -278,9 +281,13 @@ export default function Home() {
               router.push('home');
             }
             else if (data.status == 'playing') {
-              router.push(`../play/${data.inRoom}`);
+              router.push(`/play/${data.inRoom}`);
             }
           })
+          onSnapshot(collection(doc(db, 'users', user.uid), 'invite'), inviteDoc => {
+              onOpen();
+              setInviteRef(inviteDoc.docs.map(fr => ({ ...fr.data(), id: fr.id })))
+          });
         }
         else {
           console.log(null);
@@ -288,6 +295,20 @@ export default function Home() {
       })
     }
   }, [])
+
+  const acceptInv = (id, invRid) => {
+    deleteDoc(doc(doc(db, 'users', userRef.id), 'invite', id));
+    room.addPlayer(doc(db, 'room', invRid), userRef, 'in room')
+    router.push({
+      pathname: '/createRoom/[rid]',
+      query: {
+        rid: invRid
+      }
+    })
+  }
+  const rejectInv = (id) => {
+    deleteDoc(doc(doc(db, 'users', userRef.id), 'invite', id));
+  }
 
   // room class general room function.
   const room = new Room();
@@ -341,7 +362,15 @@ export default function Home() {
     })
   }
   const createRoom = async () => {
-    const newRoom = await room.create(userRef.rank.title, false)
+    const newRoom = await room.create(userRef.rank.title, false, userRef.id)
+    room.addPlayer(doc(db, 'room', newRoom.id), userRef, 'in room')
+    router.push({
+      pathname: '/createRoom/[rid]',
+      query: {
+        rid: newRoom.id
+      }
+    })
+
   }
   // all players in the current room
   const [players, setPlayers] = useState([])
@@ -387,9 +416,9 @@ export default function Home() {
         <div className='quick-match' onClick={matchingManager}>
           <div className={dongle.className}>Match</div>
         </div>
-        <Link href='/createRoom'><div className='small-btn'>
+        <div onClick={createRoom} className='small-btn'>
           <div className={dongle.className}>Create{"\n"}Room</div>
-        </div></Link>
+        </div>
         <Link href='/rank'><div className='small-btn rank'>
           <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
           <div className={dongle.className}>Rank</div>
@@ -402,7 +431,7 @@ export default function Home() {
           <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>
           <h1 className={dongle.className}>Friends</h1>
         </div></Link>
-        
+
         {ChatApp(userRef, router, 'homePage')}
         <ChatLetter className={dongle.className} left=".75em" transform="rotate(-18.73deg)">C</ChatLetter>
         <ChatLetter className={dongle.className} left="1.25em" transform="rotate(-13.91deg)">h</ChatLetter>
@@ -414,26 +443,48 @@ export default function Home() {
           <Background src={"/Img/match_bg.png"}></Background>
           <h1 visible={players[0] != undefined ? 'hidden' : 'visible'} className={dongle.className}>Matching...</h1>
 
-          <Container color="transparent" visible={players[0] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%"> 
-          <Container className={dongle.className} visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-            <PictureFlex visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster1.png"} width="80%" mbottom="0" transform="rotate(12.1deg)"></PictureFlex>
-            <Picture visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand4.png"} width="6em" bottom="-2em" left="-3em" transform="rotate(-10deg);"></Picture>
-            <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
+          <Container color="transparent" visible={players[0] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
+            <Container className={dongle.className} visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+              <PictureFlex visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster1.png"} width="80%" mbottom="0" transform="rotate(12.1deg)"></PictureFlex>
+              <Picture visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand4.png"} width="6em" bottom="-2em" left="-3em" transform="rotate(-10deg);"></Picture>
+              <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
           </Container>
 
-          <Container color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="20%"> 
+          <Container color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="20%">
             <Picture src={"/Img/vs.png"} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="10em" top="-2em" left="4em" transform="rotate(12.1deg)"></Picture>
           </Container>
-          
+
           <Container zindex="3" color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
             <Container className={dongle.className} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-            <PictureFlex visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster2.png"} width="60%" mbottom="5em" ></PictureFlex>
-            <Picture visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand1.png"} width="4.5em" bottom="-1em" right="-2em" transform="rotate(5deg);"></Picture>
-            <h2 className="player_match_label mon2"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
+              <PictureFlex visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster2.png"} width="60%" mbottom="5em" ></PictureFlex>
+              <Picture visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand1.png"} width="4.5em" bottom="-1em" right="-2em" transform="rotate(5deg);"></Picture>
+              <h2 className="player_match_label mon2"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
           </Container>
-          <Button className={dongle.className} fontsize="1.5em" margin="37.5em" color="#ECC94B"  onClick={userReady}>Ready </Button>
-          <Button className={dongle.className} fontsize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</Button>
+          <Button className={dongle.className} fontSize="1.5em" margin="37.5em" color="#ECC94B" onClick={userReady}>Ready </Button>
+          <Button className={dongle.className} fontSize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</Button>
         </ContainerFluid>
+
+        {
+          inviteRef?.map((inv, index) => (
+            <Modal key={index} closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Invitation from {inv.inviter}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={6}>
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button onClick={() => acceptInv(inv.id, inv.rid)} colorScheme='blue' mr={3}>
+                    Join
+                  </Button>
+                  <Button onClick={() => { rejectInv(inv.id) }}>Cancel</Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          ))
+        }
+
       </main>
     </>
   )

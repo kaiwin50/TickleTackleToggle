@@ -11,7 +11,7 @@ import texture1 from '../public/Img/bg_texture1.png'
 import { Flex, Text, Avatar } from '@chakra-ui/react'
 import LeaderboardItem from '@/components/LeaderboardItem'
 import { collection, getDocs, query } from 'firebase/firestore'
-import { db } from "../config/firebaseSetup";
+import { db } from "@/config/firebaseSetup";
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([]);
@@ -19,7 +19,6 @@ export default function Leaderboard() {
   useEffect(() => {
     queryUsers();
   }, []);
-
   const queryUsers = async () => {
     const usersRef = collection(db, "users");
     const rawQuery = await getDocs(usersRef);

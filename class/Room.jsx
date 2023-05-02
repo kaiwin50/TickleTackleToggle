@@ -1,25 +1,39 @@
-const { setDoc, doc, addDoc, collection, serverTimestamp, updateDoc, onSnapshot, deleteDoc, getDocs, query, getCountFromServer, where } = require("firebase/firestore")
-const { db } = require("@/config/firebaseSetup");
+import { setDoc, doc, addDoc, collection, serverTimestamp, updateDoc, onSnapshot, deleteDoc, getDocs, query, getCountFromServer, where } from "firebase/firestore"
+import { db } from "@/config/firebaseSetup"
 
 export class Room {
     constructor() {
     }
-    async create(title, matching = true) {
-        const newRoom = await addDoc(collection(db, 'room'), {
-            rank: title,
-            status: matching ? 'waiting for matching.' : 'idle',
-            createAt: serverTimestamp(),
-            isFull: false
-        })
-        return (newRoom)
+    async create(title, matching = true, owner='') {
+        if (matching) {
+            const newRoom = await addDoc(collection(db, 'room'), {
+                rank: title,
+                status: matching ? 'waiting for matching.' : 'idle',
+                createAt: serverTimestamp(),
+                isFull: false
+            })
+            return (newRoom)
+        }
+        else {
+            const newRoom = await addDoc(collection(db, 'room'), {
+                rank: title,
+                status: matching ? 'waiting for matching.' : 'idle',
+                createAt: serverTimestamp(),
+                isFull: false,
+                owner: owner
+            })
+            return (newRoom)
+        }
+
+
     }
-    addPlayer(roomRef, userRef) {
+    addPlayer(roomRef, userRef, type = 'matching') {
         setDoc(doc(roomRef, 'players', userRef.id), {
             username: userRef.username,
             isReady: false
         })
         updateDoc(doc(collection(db, 'users'), userRef.id), {
-            status: 'matching',
+            status: type,
             inRoom: roomRef.id
         })
     }

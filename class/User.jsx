@@ -1,5 +1,5 @@
-const { db } = require("@/config/firebaseSetup");
-const { onSnapshot, doc, getDoc } = require("firebase/firestore");
+import { db } from "@/config/firebaseSetup"
+import { doc, getDoc, onSnapshot } from "firebase/firestore"
 
 class User{
     constructor(){

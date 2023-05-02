@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Box } from "./Container"
 import { dongle } from '@/components/Font'
+import { db } from "@/config/firebaseSetup"
+import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore"
 const ChatBuble = styled.div`
     width: fit-content;
     height: fit-content;
@@ -120,9 +122,7 @@ const ChatInputContainer = styled.form`
 `
 
 export const ChatApp = (userRef, router, roomId) => {
-  const { db } = require('../config/firebaseSetup');
-  const { addDoc, doc, collection, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
-
+  
   const [msg, setMsg] = useState('');
   function handleSubmit(e) {
     e.preventDefault();

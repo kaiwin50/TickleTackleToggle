@@ -8,6 +8,8 @@ import { ChatContainer } from "./Chat";
 import { css } from 'styled-components'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, PictureFlex } from '@/components/Image'
+import { db } from "@/config/firebaseSetup";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 const style = css`
     .turnLabel {
         border-bottom-left-radius: 50px;

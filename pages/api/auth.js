@@ -1,7 +1,6 @@
-const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require('firebase/auth');
-const { setDoc, doc, updateDoc, onSnapshot } = require('firebase/firestore');
-const { db, default: app } = require('../../config/firebaseSetup');
-import { auth } from '../../config/firebaseSetup';
+import { auth, db } from '@/config/firebaseSetup';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 export const SignIn = (email, password, router) => {
     signInWithEmailAndPassword(auth, email, password).then( userCredential => {
@@ -12,7 +11,6 @@ export const SignIn = (email, password, router) => {
             console.error(e.message);
     })
 }
-
 export const SignUp = (email, username, password, router) => {
     createUserWithEmailAndPassword(auth, email, password).then( userCredential => {
         const user = userCredential.user;
