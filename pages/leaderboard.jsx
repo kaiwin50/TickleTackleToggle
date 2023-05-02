@@ -8,7 +8,8 @@ import { useEffect } from 'react'
 import auth, { c_user } from './api/auth'
 import { dongle,heyComic } from '@/components/Font'
 import texture1 from '../public/Img/bg_texture1.png'
-
+import { Flex, Text, Avatar } from '@chakra-ui/react'
+import LeaderboardItem from '@/components/LeaderboardItem'
 
 const style = css`
     h2{
@@ -59,79 +60,41 @@ export default function Leaderboard() {
         <link rel="icon" href="/favicon.ico" />
         <style>{ style }</style>
       </Head>
-      <main className={styles.main} style={{
-      backgroundImage: `url(${texture1.src})`,
-      height: '100vh',
-      backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    }}>
-        <Container width="100%" bdradius="0%" color="transparent"  overflowy="scroll">
-          <Container width="80%" bdradius="20px" color="#ECD352" border="4px solid #000000" shadow="0px .75px 1.25px rgba(0, 0, 0, 0.1), 0px .75px 1.25px rgba(0, 0, 0, 0.06)" className={dongle.className}>
-            <h2 className={heyComic.className}>Leaderboard</h2>
-            <Link href='/home'><CloseBtn className={dongle.className} right="-.5em">x</CloseBtn></Link>
-            <Container width="90%" height="100%" bdradius="30px" color="white" className={dongle.className}>
-                <Container className="row" width="95%" color="transparent">
-                    <Container width="60%" color="transparent" padding="0">
-                        <h3>Name</h3>
-                    </Container>
-                    <Container width="20%" color="transparent" padding="0">
-                        <h3>Rank</h3>
-                    </Container>
-                    <Container width="20%" color="transparent" padding="0">
-                        <h3>Point</h3>
-                    </Container>
-                </Container>
-
-                <Container className="row" width="95%" color="rgba(255, 104, 57, 0.84)" shadow="0px 4px 4px rgba(0, 0, 0, 0.25)" bdradius="30px">
-                    <Container width="60%" color="transparent" justify="start">
-                        <Container width="4em" height="4em" color="white" bdradius="50%" border="2px solid #000000" padding="0"></Container>
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px">
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px" >
-                    </Container>
-                </Container>
-
-                <Container className="row" width="95%" color="rgba(236, 119, 82, 0.74)" shadow="0px 4px 4px rgba(0, 0, 0, 0.25)" bdradius="30px" mgtop="2em">
-                    <Container width="60%" color="transparent" justify="start">
-                        <Container width="4em" height="4em" color="white" bdradius="50%" border="2px solid #000000" padding="0"></Container>
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px">
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px" >
-                    </Container>
-                </Container>
-
-                <Container className="row" width="95%" color="rgba(236, 165, 82, 0.74)" shadow="0px 4px 4px rgba(0, 0, 0, 0.25)" bdradius="30px" mgtop="2em">
-                    <Container width="60%" color="transparent" justify="start">
-                        <Container width="4em" height="4em" color="white" bdradius="50%" border="2px solid #000000" padding="0"></Container>
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px">
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px" >
-                    </Container>
-                </Container>
-
-                <Container className="row" width="95%" color="rgba(236, 184, 82, 0.74)" shadow="0px 4px 4px rgba(0, 0, 0, 0.25)" bdradius="30px" mgtop="2em">
-                    <Container width="60%" color="transparent" justify="start">
-                        <Container width="4em" height="4em" color="white" bdradius="50%" border="2px solid #000000" padding="0"></Container>
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px">
-                    </Container>
-                    <Container width="20%" color="transparent" bdleft="5px solid #E06667" bdradius="0px" >
-                    </Container>
-                </Container>
-
-                
-
-                
-            </Container>
-          </Container>
-        </Container>
-        
-
-        
-      </main>
+      <Flex bgColor="#8B89F7" bgImage="/Img/bg_texture1.png" bgRepeat="no-repeat" bgSize="cover" w="full" h="100vh" justify="center" align="flex-end">
+        <Flex direction="column" borderWidth='5px' borderBottom="0" maxW="4xl" maxH="2xl" justify="space-between" align="center" borderColor="black" borderRadius="20px 20px 0 0" h="full" w='full' background="#ECD352">
+            <Text fontSize="6xl" py="4" color="white" style={{ WebkitTextStrokeColor: 'black', WebkitTextStrokeWidth: '2px' }} className={heyComic.className}>Leaderboard</Text>
+            <Flex direction="column" bg="white" p="2rem 2rem 0 2rem" w="80%" h="full" borderRadius="30px 30px 0 0" maxH="lg">
+                <Flex className={dongle.className}>
+                    <Text fontSize="4xl" flex={2} textAlign="center">Name</Text>
+                    <Text fontSize="4xl" flex={1}>Rank</Text>
+                    <Text fontSize="4xl" flex={1}>Point</Text>
+                </Flex>
+                <Flex w="full" gap="4" direction="column" position="relative" overflowY="auto" py="2">
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555" color="#FF6839D6"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555" color="#EC7752BD"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555" color="#ECA552BD"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555" color="#ECB852BD"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                    <LeaderboardItem name="Pussthima" rank="Conquerer" point="555"></LeaderboardItem>
+                </Flex>
+            </Flex>
+        </Flex>
+      </Flex>
     </>
   )
 }
