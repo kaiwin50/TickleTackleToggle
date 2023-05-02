@@ -43,7 +43,7 @@ export class Room {
                         isFull: true
                     })
                 }
-                else if(playersNum.data().count < 2){
+                else if (playersNum.data().count < 2) {
                     updateDoc(doc(db, 'room', rid), {
                         isFull: false
                     })
@@ -97,7 +97,7 @@ export class Room {
                 value: '',
                 card: cards[random]
             })
-            
+
         })
         updateDoc(doc(db, 'room', rid), {
             turn: 'O',
@@ -117,17 +117,21 @@ export class Room {
         })
 
     }
-    destroy(rid, players) {
-        players.forEach((player) => {
-            updateDoc(doc(db, 'users', player.id), {
-                status: 'idle',
-                inRoom: ''
-            }).then(() => {
-                deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
-            })
-            updateDoc(doc(db, 'room', rid), {
-                isFull: false
-            })
+    destroy(rid, player) {
+        updateDoc(doc(db, 'users', player.id), {
+            status: 'idle',
+            inRoom: ''
+        }).then(() => {
+            deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
+        })
+        updateDoc(doc(db, 'room', rid), {
+            isFull: false
+        })
+    }
+    surrender(rid, player) {
+        updateDoc(doc(db, 'room', rid), {
+            status: 'Game Over',
+            winner: player.role == 'O' ? 'X' : 'O'
         })
     }
 }

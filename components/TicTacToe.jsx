@@ -64,13 +64,13 @@ export const GameBox = styled(gameBox)`
     position: relative;
     justify-content: center;
     align-items: center;
-    color: ${ props => props.fontColor };
+    color: ${props => props.fontColor};
     padding:0;
     font-size: 2em;
-    border-top-left-radius: ${ props => props.borderTopLeft };
-    border-top-right-radius: ${ props => props.borderTopRight };
-    border-bottom-left-radius: ${ props => props.borderBottomLeft };
-    border-bottom-right-radius: ${ props => props.borderBottomRight };
+    border-top-left-radius: ${props => props.borderTopLeft};
+    border-top-right-radius: ${props => props.borderTopRight};
+    border-bottom-left-radius: ${props => props.borderBottomLeft};
+    border-bottom-right-radius: ${props => props.borderBottomRight};
     font-size: 9em;
     &:hover{
         background-color: wheat;
@@ -82,7 +82,7 @@ export const GameBox = styled(gameBox)`
     }
 `
 const PlayerHand = styled.ul`
-    width: 90%;
+    width: 60%;
     height: fit-content;
     position: fixed;
     bottom: -10%;
@@ -118,6 +118,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
 
     const activateCard = useRef();
     const [toggleSelect, setToggleSelect] = useState([])
+    const [opponent, setOpponent] = useState({})
 
     const check = async () => {
         const updatedBoard = await getDocs(collection(doc(db, 'room', rid), 'board'));
@@ -157,9 +158,11 @@ function TicTacToe(rid, player = { card: [] }, router) {
                 console.log((player.activate.length != 0 && value == (player.role == 'O' ? 'X' : 'O')))
                 if (player.activate.length == 0 && value == '') {
                     const playerHand = await getDoc(doc(doc(db, 'room', rid), 'players', player.id))
-                    updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
-                        card: [...playerHand.data().card, card]
-                    })
+                    if (card != 'none') {
+                        updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+                            card: [...playerHand.data().card, card]
+                        })
+                    }
                     updateDoc(doc(doc(db, 'room', rid), 'board', id), {
                         value: player.role,
                         card: 'none'
@@ -209,11 +212,11 @@ function TicTacToe(rid, player = { card: [] }, router) {
 
                             break;
                         case 'Toggle':
-                            if(value == (player.role != 'O' ? 'X' : 'O') && toggleSelect.length == 0){
-                                setToggleSelect([{'id' : id, 'value': value}]);
+                            if (value == (player.role != 'O' ? 'X' : 'O') && toggleSelect.length == 0) {
+                                setToggleSelect([{ 'id': id, 'value': value }]);
                             }
-                            else if(value == (player.role == 'O' ? 'X' : 'O') && toggleSelect.length == 1){
-                                setToggleSelect((old) => [...old, {'id' : id, 'value': value}]);
+                            else if (value == (player.role == 'O' ? 'X' : 'O') && toggleSelect.length == 1) {
+                                setToggleSelect((old) => [...old, { 'id': id, 'value': value }]);
                                 console.log(toggleSelect)
                                 updateDoc(doc(doc(db, 'room', rid), 'board', toggleSelect[0].id), {
                                     value: value
@@ -241,8 +244,12 @@ function TicTacToe(rid, player = { card: [] }, router) {
         }
     }
 
+    const surrender = async () => {
+        room.surrender(rid, player);
+        router.replace('../home')
+    }
     const endPlay = async () => {
-        room.destroy(rid, players);
+        room.destroy(rid, player);
         router.replace('../home')
     }
     const deactivate = () => {
@@ -267,36 +274,47 @@ function TicTacToe(rid, player = { card: [] }, router) {
     return (<>
         <style>{style}</style>
         <ContainerAbsolute className="turnLabel" width="25%" height="17.5%" top="0" left="37.5%">
-            <h1 className={heyComic.className}>Turn : { roomRef?.turn }</h1>
+            <h1 className={heyComic.className}>Turn : {roomRef?.turn}</h1>
         </ContainerAbsolute>
         <ContainerAbsolute className="profile-match" width="30%" height="60%" bottom="0" left="2.5%" padding="0" color="transparent">
             <h2 className={heyComic.className}>Activate Card</h2>
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
-            {(player.activate)?.map((cardName, index) => (
-                <li key={index} onClick={deactivate} >
-                    <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
-                </li>
-            ))}
+                {(player.activate)?.map((cardName, index) => (
+                    <li key={index} onClick={deactivate} >
+                        <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
+                    </li>
+                ))}
             </Container>
-            <h3 className={dongle.className}>Your Role : { player?.role }</h3>
+            <h3 className={dongle.className}>Your Role : {player?.role}</h3>
         </ContainerAbsolute>
 
         <ContainerAbsolute className="profile-match2" width="30%" height="60%" top="0" right="2.5%" padding="0" color="transparent">
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px">
+                {(players)?.map((opponent, index) => {
+                    if (opponent.id != player.id && opponent.data().activate[0] != undefined) {
+                        return (
+                            <li key={index} onClick={deactivate} >
+                                <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></embed>
+                            </li>
+                        )
+                    }
+
+                })}
+
             </Container>
             <h2 className={heyComic.className}>Activate Card</h2>
         </ContainerAbsolute>
-        
+
 
         <Container width="40%" color="transparent" mgtop="5%" padding="0">
             {
                 boardRef?.map(({ value, card, id }) => (
-                    <GameBox className={ dongle.className } key={id} onClick={() => { write(id, card, value) }} 
-                    borderTopLeft={ id=='t0' ? '25px' : '0' }
-                     borderTopRight={ id=='t2' ? '25px' : '0' }
-                      borderBottomLeft={ id=='t6' ? '25px' : '0' }
-                       borderBottomRight={ id=='t8' ? '25px' : '0' }
-                        fontColor={ value == 'O' ? '#13ec9e' : '#8B89F7' }>
+                    <GameBox className={dongle.className} key={id} onClick={() => { write(id, card, value) }}
+                        borderTopLeft={id == 't0' ? '25px' : '0'}
+                        borderTopRight={id == 't2' ? '25px' : '0'}
+                        borderBottomLeft={id == 't6' ? '25px' : '0'}
+                        borderBottomRight={id == 't8' ? '25px' : '0'}
+                        fontColor={value == 'O' ? '#13ec9e' : '#8B89F7'}>
                         <p>{value}</p>
                         <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${card}.svg`} width="77px" height="108px"></embed>
                     </GameBox>
@@ -311,17 +329,19 @@ function TicTacToe(rid, player = { card: [] }, router) {
             ))}
         </PlayerHand>
         <Container width="100%" color="transparent" justify="end">
-        <Button color="#E53E3E" className={dongle.className} fontsize="1.5em" bdradius="10px" hovercolor="#de3500" fontcolor="white" onClick={ endPlay }>Surrender</Button>
+            <Button color="#E53E3E" className={dongle.className} style={{ bottom: '200px', position: 'absolute' }} fontsize="1.5em" bdradius="10px" hovercolor="#de3500" fontcolor="white" onClick={surrender}>Surrender</Button>
         </Container>
-        <ContainerAbsolute className="win_page" width="100%" height="100%" top="0" left="0" visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'} zindex="4" >
-           <Picture visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'}  src={"/Img/bg_texture4.png"} width="100%" height="100%" top="0" left="0"></Picture>
-           <Container width="100%" color="transparent" visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'}>
-            <PictureFlex visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'} src={"/Img/win.png"} width="40%"></PictureFlex>
-           </Container>
-           <h1 className={heyComic.className}>{ roomRef?.winner }</h1>
-           <Button color="#805AD5" className={dongle.className} fontsize="2em" bdradius="6px" hovercolor="#543b8c" fontcolor="white" onClick={ endPlay }>Home</Button>
+        <ContainerAbsolute className="win_page" width="100%" height="100%" top="0" left="0" visible={roomRef ? (roomRef.status == 'Game Over' ? 'visible' : 'hidden') : 'hidden'} zindex="4" >
+            <Picture visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? 'bg_win' : 'bg_lose'}.png`} width="100%" height="100%" top="0" left="0"></Picture>
+            <Container width="100%" color="transparent" visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'}>
+                <div style={{ paddingTop: '10vh', width: '37.5vw', height: '37.5vw', background: '#ffffffa6', borderRadius: '50%', boxShadow: '0px 12px 5px #000000a1', justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+                    <PictureFlex visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? 'win' : 'lose'}.png`} width="40%"></PictureFlex>
+                    <h1 className={heyComic.className} style={{ paddingTop: '17vh'}}>{roomRef.winner == player.role ? 'Victory !' : 'Defeat'}</h1>
+                    <h1 className={heyComic.className} style={{ paddingTop: '17vh'}}>{player?.role}</h1>
+                </div>
+            </Container>
+            <Button color="#805AD5" className={dongle.className} fontsize="2em" bdradius="6px" hovercolor="#543b8c" fontcolor="white" onClick={endPlay}>Home</Button>
         </ContainerAbsolute>
-
     </>
     );
 }
