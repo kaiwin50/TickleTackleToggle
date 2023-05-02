@@ -40,6 +40,7 @@ const ChatContainer = styled.div`
     box-shadow: 2px 4px 2px rgba(0, 0, 0, 0.25);
     bottom: ${props => props.bottom || '21%' };
     left: 0;
+    top: ${ props => props.top};
     /* overflow-y: auto; */
     border-top-right-radius: .5em;
     border-bottom-right-radius: .5em;
@@ -155,6 +156,7 @@ export const ChatApp = (userRef, router, roomId) => {
   useEffect(() => {
     if (router.isReady) {
       fetchChatMessages();
+      console.log()
     }
   }, [router.isReady])
 
@@ -165,7 +167,7 @@ export const ChatApp = (userRef, router, roomId) => {
 
   return (
     <>
-    <ChatContainer>
+    <ChatContainer top={ (router.pathname)?.split('/')[1] == 'play' ? '0' : 'null' }>
       <div style={{position: 'absolute', height: '90%', top: '0', overflowY: 'auto', width: '100%'}}>
         {allMsg?.map((chat, index) => {
           return (

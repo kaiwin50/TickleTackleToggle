@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import auth, { c_user } from './api/auth'
 import { dongle } from '@/components/Font'
+import texture1 from '../public/Img/bg_texture1.png'
+import { PictureFlex } from '@/components/Image'
 
 
 const style = css`
@@ -37,15 +39,20 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <style>{ style }</style>
       </Head>
-      <main className={styles.main}>
+      <main className={styles.main} style={{
+      backgroundImage: `url(${texture1.src})`,
+      height: '100vh',
+      backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    }}>
         <Container width="100vw" bdradius="0%" color="transparent" >
           <Container width="100%" color="transparent">
-            
+            <PictureFlex src={"/Img/logo.png"} width="30%"></PictureFlex>
           </Container>
           <Container width="50%" color="transparent">
             <ul>
-              <li><Link href='./signIn'><LoginBtn className={dongle.className}>LOG IN</LoginBtn></Link></li>
               <li><Link href='./signUp'><SignUpBtn className={dongle.className}>REGISTER</SignUpBtn></Link></li>
+              <li><Link href='./signIn'><LoginBtn className={dongle.className}>LOG IN</LoginBtn></Link></li>
             </ul>
           </Container>
         </Container>

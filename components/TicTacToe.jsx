@@ -1,10 +1,53 @@
 import styled from "styled-components";
-import { Container } from "./Container";
+import { Container, ContainerAbsolute } from "./Container";
 import { useEffect, useRef, useState } from "react";
+
 import { Room } from "@/class/Room";
 import { Button } from "./Button";
 import { ChatContainer } from "./Chat";
-
+import { css } from 'styled-components'
+import { dongle, heyComic } from '@/components/Font'
+import { Picture, PictureFlex } from '@/components/Image'
+const style = css`
+    .turnLabel {
+        border-bottom-left-radius: 50px;
+        border-bottom-right-radius: 50px;
+        background: rgba(74, 38, 134, 0.7);
+        border: 3px solid #2724B2;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    .turnLabel h1{
+        color: #FF6839;
+        font-size: 3em;
+    }
+    .profile-match h3{
+        width:100%;
+        justify-content: center;
+        display: flex;
+        font-size:2em;
+        color: black;
+    }
+    .profile-match h2{
+        width:100%;
+        justify-content: center;
+        display: flex;
+    }
+    .profile-match2 h2{
+        width:100%;
+        justify-content: center;
+        display: flex;
+        margin-top:-5em;
+    }
+    .win_page h1 {
+        z-index:5;
+        color:black;
+        width:100%;
+        display:flex;
+        justify-content:center;
+        margin-top:-18%;
+        font-size: 4em;
+    }
+`
 const gameBox = ({ className, children, props, onClick }) => (
     <div className={className} onClick={onClick} {...props}>
         {children}
@@ -12,18 +55,25 @@ const gameBox = ({ className, children, props, onClick }) => (
 );
 
 export const GameBox = styled(gameBox)`
-    width: 10em;
-    height: 10em;
-    background-color: ${props => props.color || "#3e2b85"};
+    width: 1em;
+    height: 1em;
+    background-color: ${props => props.color || "white"};
+    border : 2px solid #2724B2;
     display: inline-flex;
-    margin: .25em;
-    border-radius: 1em;
     cursor: pointer;
     position: relative;
     justify-content: center;
     align-items: center;
+    color: ${ props => props.fontColor };
+    padding:0;
+    font-size: 2em;
+    border-top-left-radius: ${ props => props.borderTopLeft };
+    border-top-right-radius: ${ props => props.borderTopRight };
+    border-bottom-left-radius: ${ props => props.borderBottomLeft };
+    border-bottom-right-radius: ${ props => props.borderBottomRight };
+    font-size: 9em;
     &:hover{
-        background-color: #51467f;
+        background-color: wheat;
     }
     & p{
         position: absolute;
@@ -182,6 +232,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                                 })
                                 setToggleSelect([])
                             }
+                            break;
 
                     }
                 }
@@ -214,18 +265,40 @@ function TicTacToe(rid, player = { card: [] }, router) {
         }
     }, [router.isReady])
     return (<>
-        <Container width="35em">turn : {roomRef?.turn}</Container>
-        <Container width="35em">Your Role : {player?.role}</Container>
-        <Container width="35em" visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'}>
-            winner:  {roomRef?.winner}
-        </Container>
+        <style>{style}</style>
+        <ContainerAbsolute className="turnLabel" width="25%" height="17.5%" top="0" left="37.5%">
+            <h1 className={heyComic.className}>Turn : { roomRef?.turn }</h1>
+        </ContainerAbsolute>
+        <ContainerAbsolute className="profile-match" width="30%" height="60%" bottom="0" left="2.5%" padding="0" color="transparent">
+            <h2 className={heyComic.className}>Activate Card</h2>
+            <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
+            {(player.activate)?.map((cardName, index) => (
+                <li key={index} onClick={deactivate} >
+                    <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
+                </li>
+            ))}
+            </Container>
+            <h3 className={dongle.className}>Your Role : { player?.role }</h3>
+        </ContainerAbsolute>
 
-        <Container width="35em" color="wheat">
+        <ContainerAbsolute className="profile-match2" width="30%" height="60%" top="0" right="2.5%" padding="0" color="transparent">
+            <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px">
+            </Container>
+            <h2 className={heyComic.className}>Activate Card</h2>
+        </ContainerAbsolute>
+        
+
+        <Container width="40%" color="transparent" mgtop="5%" padding="0">
             {
                 boardRef?.map(({ value, card, id }) => (
-                    <GameBox key={id} onClick={() => { write(id, card, value) }}>
+                    <GameBox className={ dongle.className } key={id} onClick={() => { write(id, card, value) }} 
+                    borderTopLeft={ id=='t0' ? '25px' : '0' }
+                     borderTopRight={ id=='t2' ? '25px' : '0' }
+                      borderBottomLeft={ id=='t6' ? '25px' : '0' }
+                       borderBottomRight={ id=='t8' ? '25px' : '0' }
+                        fontColor={ value == 'O' ? '#13ec9e' : '#8B89F7' }>
                         <p>{value}</p>
-                        <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${card}.svg`} width="115.5px" height="162px"></embed>
+                        <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${card}.svg`} width="77px" height="108px"></embed>
                     </GameBox>
                 )
                 )}
@@ -237,14 +310,18 @@ function TicTacToe(rid, player = { card: [] }, router) {
                 </li>
             ))}
         </PlayerHand>
-        <Button onClick={endPlay}>end</Button>
-        <ChatContainer ref={activateCard} style={{ top: '5%', height: 'fit-content', width: 'fit-content', padding: '1em' }}>
-            {(player.activate)?.map((cardName, index) => (
-                <li key={index} onClick={deactivate} >
-                    <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
-                </li>
-            ))}
-        </ChatContainer>
+        <Container width="100%" color="transparent" justify="end">
+        <Button color="#E53E3E" className={dongle.className} fontsize="1.5em" bdradius="10px" hovercolor="#de3500" fontcolor="white" onClick={ endPlay }>Surrender</Button>
+        </Container>
+        <ContainerAbsolute className="win_page" width="100%" height="100%" top="0" left="0" visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'} zindex="4" >
+           <Picture visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'}  src={"/Img/bg_texture4.png"} width="100%" height="100%" top="0" left="0"></Picture>
+           <Container width="100%" color="transparent" visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'}>
+            <PictureFlex visible={ roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible'): 'hidden'} src={"/Img/win.png"} width="40%"></PictureFlex>
+           </Container>
+           <h1 className={heyComic.className}>{ roomRef?.winner }</h1>
+           <Button color="#805AD5" className={dongle.className} fontsize="2em" bdradius="6px" hovercolor="#543b8c" fontcolor="white" onClick={ endPlay }>Home</Button>
+        </ContainerAbsolute>
+
     </>
     );
 }
