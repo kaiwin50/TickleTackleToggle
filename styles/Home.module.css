@@ -6,7 +6,11 @@
   padding: 6rem;
   min-height: 100vh;
   background-color: #8B89F7;
-  overflow: hidden;
+  /* overflow: hidden; */
+}
+
+.card {
+  border-radius: 25px;
 }
 
 .description {

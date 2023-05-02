@@ -38,7 +38,6 @@ export class Room {
                 setter({ ...snapshot.data(), id: snapshot.id })
                 const q = query(collection(doc(db, 'room', rid), 'players'))
                 const playersNum = await getCountFromServer(q)
-                console.log(playersNum.data().count)
                 if (playersNum.data().count == 2) {
                     updateDoc(doc(db, 'room', rid), {
                         isFull: true
@@ -91,10 +90,14 @@ export class Room {
     }
     start(rid, playerSnap) {
         (['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8']).forEach((value) => {
+            const cards = ['Tickle', 'Tackle', 'Toggle'];
+            let random = Math.floor(Math.random() * 3);
+            console.log(random)
             setDoc(doc(doc(db, 'room', rid), 'board', value), {
                 value: '',
-                card: ''
+                card: cards[random]
             })
+            
         })
         updateDoc(doc(db, 'room', rid), {
             turn: 'O',
@@ -102,13 +105,15 @@ export class Room {
         })
         playerSnap.docs.forEach((docRef, index) => {
             updateDoc(doc(doc(db, 'room', rid), 'players', docRef.id), {
-                role: index ? 'O' : 'X'
+                role: index ? 'O' : 'X',
+                card: [],
+                activate: []
             })
         })
     }
     subscribeUser(rid, uid, setter) {
         onSnapshot(doc(doc(db, 'room', rid), 'players', uid), snapshot => {
-            setter(snapshot.data());
+            setter({ ...snapshot.data(), id: uid });
         })
 
     }

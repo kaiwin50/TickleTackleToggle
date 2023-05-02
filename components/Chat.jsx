@@ -38,7 +38,7 @@ const ChatContainer = styled.div`
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid #000000;
     box-shadow: 2px 4px 2px rgba(0, 0, 0, 0.25);
-    bottom: 21%;
+    bottom: ${props => props.bottom || '21%' };
     left: 0;
     /* overflow-y: auto; */
     border-top-right-radius: .5em;

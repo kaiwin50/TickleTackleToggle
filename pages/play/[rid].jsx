@@ -12,7 +12,6 @@ import { User } from '@/class/User'
 import TicTacToe from '@/components/TicTacToe'
 import { Room } from '@/class/Room'
 
-
 const style = css`
   ul{
     list-style-type: none;
@@ -132,7 +131,7 @@ export default function Home() {
               router.push('home');
             }
             else if (data.status == 'playing') {
-              router.push(`../play/${data.inRoom}`);
+              router.push(`../../play/${data.inRoom}`);
             }
           })
         }
@@ -169,8 +168,6 @@ export default function Home() {
         <style>{style}</style>
       </Head>
       <main className={styles.main}>
-        <div className='blurBg'></div>
-        <div className='blurBg2'></div>
         <Container width="80%">
           <h1>{userRef.username}</h1>
         </Container>
