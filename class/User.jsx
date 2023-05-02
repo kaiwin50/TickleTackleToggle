@@ -1,4 +1,4 @@
-const { db } = require("@/pages/api/firebaseSetup");
+const { db } = require("@/config/firebaseSetup");
 const { onSnapshot, doc, getDoc } = require("firebase/firestore");
 
 class User{

@@ -119,7 +119,7 @@ const ChatInputContainer = styled.form`
 `
 
 export const ChatApp = (userRef, router, roomId) => {
-  const { db } = require('../pages/api/firebaseSetup');
+  const { db } = require('../config/firebaseSetup');
   const { addDoc, doc, collection, onSnapshot, orderBy, query, serverTimestamp } = require('firebase/firestore');
 
   const [msg, setMsg] = useState('');
