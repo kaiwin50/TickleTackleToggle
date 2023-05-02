@@ -390,10 +390,10 @@ export default function Home() {
         <Link href='/createRoom'><div className='small-btn'>
           <div className={dongle.className}>Create{"\n"}Room</div>
         </div></Link>
-        <div className='small-btn rank' onClick={matchingManager}>
+        <Link href='/rank'><div className='small-btn rank'>
           <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
           <div className={dongle.className}>Rank</div>
-        </div>
+        </div></Link>
         <Link href='/leaderboard'><div className='leader-btn'>
           <Picture src={"/Img/hand1.png"} width="3.5em" top=".1em" left="2em"></Picture>
           <h1 className={dongle.className}>Leader Board</h1>
@@ -403,7 +403,6 @@ export default function Home() {
           <h1 className={dongle.className}>Friends</h1>
         </div></Link>
         
-        <Button onClick={destroyRoom}>reset</Button>
         {ChatApp(userRef, router, 'homePage')}
         <ChatLetter className={dongle.className} left=".75em" transform="rotate(-18.73deg)">C</ChatLetter>
         <ChatLetter className={dongle.className} left="1.25em" transform="rotate(-13.91deg)">h</ChatLetter>

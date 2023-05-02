@@ -178,7 +178,7 @@ export default function CreateRoom() {
                     </Container>
                 </Container>
                 <Container width="100%" bdradius="0%" color="transparent" >
-                    <Button padding="2em" className={dongle.className} fontsize="2em" border="1px solid #000000">Ready</Button>
+                    <Button padding="2em" className={dongle.className} color="#ECC94B" fontsize="2em" border="1px solid #000000">Ready</Button>
                 </Container>
             </Container>
             <Container width="25%" height="130%" bdradius="10px" color="white" shadow="6px 6px 1px 4px rgba(0, 0, 0, 0.5)" mgtop="-4em">
