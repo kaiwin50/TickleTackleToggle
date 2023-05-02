@@ -15,6 +15,8 @@ const Container = styled(Box)`
   width: ${props => props.width || "fit-content"};
   height: ${props => props.height || "fit-content"};
   padding: ${props => props.padding || "1em"};
+  padding-top: ${props => props.pdtop};
+  padding-bottom: ${props => props.pdbottom};
   border-radius: ${props => props.bdradius || "1em"};
   position: relative;
   border: ${props => props.border};

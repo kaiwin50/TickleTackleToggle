@@ -387,9 +387,9 @@ export default function Home() {
         <div className='quick-match' onClick={matchingManager}>
           <div className={dongle.className}>Match</div>
         </div>
-        <div className='small-btn' onClick={matchingManager}>
+        <Link href='/createRoom'><div className='small-btn'>
           <div className={dongle.className}>Create{"\n"}Room</div>
-        </div>
+        </div></Link>
         <div className='small-btn rank' onClick={matchingManager}>
           <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
           <div className={dongle.className}>Rank</div>

@@ -11,8 +11,8 @@ const Button = styled(Btn)`
   background-color : ${props => props.color || "goldenrod"};
   padding: .5em 1em;
   border-radius: ${props => props.bdradius || ".5em"};
-  filter: drop-shadow(0 5px #8b6912);
-  border: none;
+  filter: drop-shadow(0 5px rgba(0, 0, 0, 0.25));
+  border: ${props => props.border || "none"};
   cursor: pointer;
   font-size: ${props => props.fontsize || "1em"};
   color : ${props => props.fontcolor || "black"};
@@ -20,7 +20,7 @@ const Button = styled(Btn)`
   &:hover{
     background-color : ${props => props.hovercolor || "#c1972d"};
     top: 2px;
-    filter: drop-shadow(0 3px #8b6912);
+    filter: drop-shadow(0 3px rgba(0, 0, 0, 0.25));
   }
 `
 const LoginBtn = styled(Btn)`

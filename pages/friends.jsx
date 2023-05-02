@@ -63,7 +63,7 @@ const style = css`
         font-size:1.2em;
     }
 `
-export default function Leaderboard() {
+export default function Friends() {
   useEffect(()=>{
     console.log(c_user)
   }, [])

@@ -33,5 +33,6 @@ const PictureFlex = styled(Image)`
   transform : ${props => props.transform};
   visibility: ${ props => props.visible || 'visible'};
   margin-bottom: ${props => props.mbottom};
+  margin-top: ${props => props.mtop};
 `
 export { Image, Background, Picture, PictureFlex }
