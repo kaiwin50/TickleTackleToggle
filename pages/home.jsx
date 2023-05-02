@@ -5,14 +5,14 @@ import { Container,ContainerFluid } from '@/components/Container'
 import { Button } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { ProgressBar } from  'react-loader-spinner'
 import { ChatApp,ChatLetter } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
 import auth from './api/auth'
 import { dongle, heyComic } from '@/components/Font'
-import { Picture,Background } from '@/components/Image'
-import match_bg from '../public/Img/match_bg.png'
+import { Picture,Background,PictureFlex } from '@/components/Image'
+import Link from 'next/link'
+import texture1 from '../public/Img/bg_texture1.png'
 
 const style = css`
   /* input[name='msg']{
@@ -181,8 +181,8 @@ const style = css`
   .matching h1{
     color: white;
     width: 40%;
-    right:0;
-    top:40%;
+    right:17.5%;
+    top:20%;
     font-size:4em;
     visibility: ${ props => props.visible || 'visible'};
     position:absolute;
@@ -221,6 +221,7 @@ const style = css`
     flex-wrap:wrap;
     justify-content:center;
     align-items:center;
+    margin-top:-2em;
   }
   .player_match_label p {
     width:100%;
@@ -233,7 +234,9 @@ const style = css`
   .player_match_name {
     font-size:.75em;
   }
-  
+  .mon2{
+    margin-top:-3.5em
+  }
 `
 // initial room data use for escape error when some variable is unload.
 const roomInit = {
@@ -369,7 +372,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <style>{style}</style>
       </Head>
-      <main id='re' className={styles.main}>
+      <main id='re' className={styles.main} style={{
+        backgroundImage: `url(${texture1.src})`,
+        height: '100vh',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+      }}>
         <div className='profileP'>
           <div className='profileImg'></div>
           <h1 className={dongle.className}>{userRef.username} </h1>
@@ -386,14 +394,14 @@ export default function Home() {
           <Picture src={"/Img/fire.png"} width="7em" top="6.25em" right="1.5em"></Picture>
           <div className={dongle.className}>Rank</div>
         </div>
-        <div className='leader-btn'>
+        <Link href='/leaderboard'><div className='leader-btn'>
           <Picture src={"/Img/hand1.png"} width="3.5em" top=".1em" left="2em"></Picture>
           <h1 className={dongle.className}>Leader Board</h1>
-        </div>
-        <div className='friend-btn'>
+        </div></Link>
+        <Link href='/friends'><div className='friend-btn'>
           <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>
           <h1 className={dongle.className}>Friends</h1>
-        </div>
+        </div></Link>
         
         <Button onClick={destroyRoom}>reset</Button>
         {ChatApp(userRef, router, 'homePage')}
@@ -409,6 +417,8 @@ export default function Home() {
 
           <Container color="transparent" visible={players[0] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%"> 
           <Container className={dongle.className} visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
+            <PictureFlex visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster1.png"} width="80%" mbottom="0" transform="rotate(12.1deg)"></PictureFlex>
+            <Picture visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand4.png"} width="6em" bottom="-2em" left="-3em" transform="rotate(-10deg);"></Picture>
             <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
           </Container>
 
@@ -418,10 +428,12 @@ export default function Home() {
           
           <Container zindex="3" color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
             <Container className={dongle.className} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-            <h2 className="player_match_label"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
+            <PictureFlex visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster2.png"} width="60%" mbottom="5em" ></PictureFlex>
+            <Picture visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand1.png"} width="4.5em" bottom="-1em" right="-2em" transform="rotate(5deg);"></Picture>
+            <h2 className="player_match_label mon2"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
           </Container>
-          <Button  onClick={userReady}>Ready </Button>
-          <Button onClick={destroyRoom}>Cancel</Button>
+          <Button className={dongle.className} fontsize="1.5em" margin="37.5em" color="#ECC94B"  onClick={userReady}>Ready </Button>
+          <Button className={dongle.className} fontsize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</Button>
         </ContainerFluid>
       </main>
     </>

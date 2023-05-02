@@ -10,7 +10,7 @@ const Box = ({ className, children, props }) => (
 
 const Container = styled(Box)`
   background-color: ${props => props.color || "#3e2b85"};
-  justify-content: center;
+  justify-content:  ${props => props.justify || "center"}; 
   align-items: center;
   width: ${props => props.width || "fit-content"};
   height: ${props => props.height || "fit-content"};
@@ -23,6 +23,11 @@ const Container = styled(Box)`
   flex-wrap: wrap;
   visibility: ${ props => props.visible || 'visible'};
   z-index: ${props => props.zindex};
+  border-left: ${props => props.bdleft};
+  border-bottom: ${props => props.bdbottom};
+  margin-top: ${props => props.mgtop};
+  margin-left: ${props => props.mgleft};
+  overflow-y: ${props => props.overflowy};
 `
 
 const ContainerFluid = styled(Box)`
@@ -42,5 +47,25 @@ const ContainerFluid = styled(Box)`
   flex-wrap: wrap;
   visibility: ${ props => props.visible || 'visible'};
 `
+const ContainerAbsolute = styled(Box)`
+  background-color: ${props => props.color || "#ECD352"};
+  justify-content: center;
+  align-items: center;
+  width: ${props => props.width};
+  height: ${props => props.height};
+  padding: ${props => props.padding || "1em"};
+  border-radius: ${props => props.bdradius};
+  position: absolute;
+  top:${props => props.top};
+  bottom:${props => props.bottom};
+  left:${props => props.left};
+  right:${props => props.right};
+  border: ${props => props.border};
+  box-shadow: ${props => props.shadow};
+  display: flex;
+  flex-wrap: wrap;
+  visibility: ${ props => props.visible || 'visible'};
+  z-index: ${props => props.zindex};
+`
 
-export { Container, Box, ContainerFluid }
+export { Container, Box, ContainerFluid, ContainerAbsolute }

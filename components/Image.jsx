@@ -25,5 +25,13 @@ const Picture = styled(Image)`
   right : ${props => props.right};
   transform : ${props => props.transform};
   visibility: ${ props => props.visible || 'visible'};
+  border-radius: ${ props => props.bdradius || '1em'};
 `
-export { Image, Background, Picture }
+const PictureFlex = styled(Image)`
+  width: ${props => props.width || "fit-content"};
+  height: ${props => props.height || "fit-content"};
+  transform : ${props => props.transform};
+  visibility: ${ props => props.visible || 'visible'};
+  margin-bottom: ${props => props.mbottom};
+`
+export { Image, Background, Picture, PictureFlex }

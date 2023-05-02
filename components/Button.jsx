@@ -10,14 +10,15 @@ const Button = styled(Btn)`
   position: relative;
   background-color : ${props => props.color || "goldenrod"};
   padding: .5em 1em;
-  border-radius: .5em;
+  border-radius: ${props => props.bdradius || ".5em"};
   filter: drop-shadow(0 5px #8b6912);
   border: none;
   cursor: pointer;
   font-size: ${props => props.fontsize || "1em"};
   color : ${props => props.fontcolor || "black"};
+  margin-left: ${props => props.margin};
   &:hover{
-    background-color : #c1972d;
+    background-color : ${props => props.hovercolor || "#c1972d"};
     top: 2px;
     filter: drop-shadow(0 3px #8b6912);
   }
@@ -32,7 +33,7 @@ border: none;
 cursor: pointer;
 font-size: 2em;
 &:hover{
-  background-color : #c1972d;
+  background-color : #e8c305;
   top: 2px;
   filter: drop-shadow(0 3px #8b6912);
 }
@@ -41,7 +42,7 @@ font-size: 2em;
 
 const SignUpBtn = styled(Btn)`
 position: relative;
-background-color : #3182CE;
+background-color : #FF6839;
 padding: 1em;
 border-radius: 1em;
 filter: drop-shadow(0 5px #133453);
@@ -49,7 +50,7 @@ border: none;
 cursor: pointer;
 font-size: 2em;
 &:hover{
-  background-color : #215b91;
+  background-color : #de3500;
   top: 2px;
   filter: drop-shadow(0 3px #133453);
 }
@@ -66,8 +67,9 @@ const CloseBtn = styled(Btn)`
   color : ${props => props.fontcolor || "black"};
   position : absolute;
   top : -.5em;
+  right: ${props => props.right};
   &:hover{
-    background-color : #c1972d;
+    background-color : #de3500;
   }
   
 `

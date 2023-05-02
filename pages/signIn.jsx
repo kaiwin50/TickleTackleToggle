@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import styles from '@/styles/Home.module.css'
 import { heyComic, dongle } from "@/components/Font";
 import Link from 'next/link'
+import texture1 from '../public/Img/bg_texture1.png'
 
 const style = css`
     div{
@@ -111,7 +112,12 @@ export default function signInPage() {
     return (
         <>
             <style>{style}</style>
-            <main className={styles.main}>
+            <main className={styles.main} style={{
+            backgroundImage: `url(${texture1.src})`,
+            height: '100vh',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            }}>
                 <ContextAuth.Provider value={u_username}>
                     <h2 className={[heyComic.className, "title"].join(" ")}>Tickle Tackle Toggle</h2>
                     <Container color="#F76363" border="3px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)" className={dongle.className}> 

@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
-import { Container } from '@/components/Container'
+import { ContainerAbsolute, Container } from '@/components/Container'
 import { Button } from '@/components/Button'
 import { useState, useEffect, cloneElement, useRef, useContext } from 'react'
 import { useRouter } from 'next/router'
@@ -11,6 +11,9 @@ import auth from '../api/auth'
 import { User } from '@/class/User'
 import TicTacToe from '@/components/TicTacToe'
 import { Room } from '@/class/Room'
+import texture3 from '../../public/Img/bg_texture3.png'
+import { dongle, heyComic } from '@/components/Font'
+import { Picture, PictureFlex } from '@/components/Image'
 
 
 const style = css`
@@ -97,6 +100,14 @@ const style = css`
     height: 100%;
     font-size: 4em;
   }
+  .iYmDAq {
+    top:0;
+  }
+  .name_match h3{
+    font-size: 2em;
+    margin-left: 1em;
+    color: black;
+  }
 `
 
 
@@ -168,13 +179,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <style>{style}</style>
       </Head>
-      <main className={styles.main}>
-        <div className='blurBg'></div>
-        <div className='blurBg2'></div>
-        <Container width="80%">
-          <h1>{userRef.username}</h1>
+      <main className={styles.main} style={{
+      backgroundImage: `url(${texture3.src})`,
+      height: '100vh',
+      backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    }}>
+      <ContainerAbsolute className="name_match" bottom="2.5%" left="4%" color="transparent" zindex="3">
+        <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
+          <PictureFlex src={"/Img/monster1.png"} width="5em"></PictureFlex>
         </Container>
-        playing...s
+        <h3 className={dongle.className}>Player : {userRef.username}</h3>
+      </ContainerAbsolute>
+      <ContainerAbsolute className="name_match" top="3%" right="3%" color="transparent" zindex="3">
+        <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
+          <PictureFlex src={"/Img/monster2.png"} width="2.5em"></PictureFlex>
+        </Container>
+      </ContainerAbsolute>
         {TicTacToe(rid, player, router)}
 
         <div>{ChatApp(userRef, router, rid)}</div>
