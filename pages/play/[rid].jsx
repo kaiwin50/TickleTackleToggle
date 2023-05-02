@@ -14,6 +14,8 @@ import { Room } from '@/class/Room'
 import texture3 from '../../public/Img/bg_texture3.png'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, PictureFlex } from '@/components/Image'
+import { db } from '@/config/firebaseSetup'
+import { doc, onSnapshot } from 'firebase/firestore'
 
 
 const style = css`
@@ -100,9 +102,7 @@ const style = css`
     height: 100%;
     font-size: 4em;
   }
-  .iYmDAq {
-    top:0;
-  }
+
   .name_match h3{
     font-size: 2em;
     margin-left: 1em;
@@ -113,6 +113,7 @@ const style = css`
 
 
 export default function Home() {
+
   // query url data
   const router = useRouter();
   const { rid } = router.query;
@@ -120,6 +121,10 @@ export default function Home() {
   const room = new Room();
   const [uid, setUid] = useState('');
   const [player, setPlayer] = useState({})
+
+  // fetch user data
+  const [userRef, setUserRef] = useState({});
+
   useEffect(() => {
     if(router.isReady){
       try {
@@ -131,10 +136,7 @@ export default function Home() {
       auth.onAuthStateChanged(user => {
         if (user) {
           console.log('user: ', user)
-          setUid(user.uid)
           room.subscribeUser(rid, user.uid, setPlayer);
-
-
           onSnapshot(doc(db, 'users', user.uid), userInfo => {
             setUserRef({ ...userInfo.data(), id: userInfo.id })
             const data = userInfo.data();
@@ -155,19 +157,6 @@ export default function Home() {
     }
     
   }, [router.isReady])
-
-
-
-
-  // import database
-  const { db } = require('../../config/firebaseSetup');
-  const { addDoc, collection, doc, getDoc, updateDoc, onSnapshot, orderBy, query, where, serverTimestamp, getCountFromServer, deleteDoc } = require('firebase/firestore');
-
-  // fetch user data
-  const [userRef, setUserRef] = useState({});
-
-
-
 
 
   return (
@@ -197,7 +186,6 @@ export default function Home() {
         </Container>
       </ContainerAbsolute>
         {TicTacToe(rid, player, router)}
-
         <div>{ChatApp(userRef, router, rid)}</div>
       </main>
     </>

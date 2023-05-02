@@ -8,6 +8,8 @@ import styles from '@/styles/Home.module.css'
 import { heyComic, dongle } from "@/components/Font";
 import Link from 'next/link'
 import texture1 from '../public/Img/bg_texture1.png'
+import { db } from "@/config/firebaseSetup";
+import { collection, doc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 
 const style = css`
     div{
@@ -68,9 +70,8 @@ export default function signInPage() {
     const [u_username, setUsername] = useState("");
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
-    const { getDocs, collection, query, where, doc, setDoc, updateDoc, onSnapshot } = require("firebase/firestore");
+    // const { getDocs, collection, query, where, doc, setDoc, updateDoc, onSnapshot } = require("firebase/firestore");
     const { SignIn, default: auth } = require("./api/auth");
-    const { db } = require("../config/firebaseSetup");
     const router = useRouter();
     async function formHandler(e) {
         e.preventDefault();
@@ -89,6 +90,12 @@ export default function signInPage() {
         }
     }
     useEffect(()=>{
+        // const someTest = async () => {
+        //     const users = await getDocs(collection(db, 'users'))
+        //     users.docs.forEach(element => {
+        //         console.log(element.data());
+        //     });
+        // }
         auth.onAuthStateChanged(user => {
             if(user){
                 console.log('user: ', user)

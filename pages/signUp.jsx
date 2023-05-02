@@ -10,6 +10,9 @@ import { heyComic, dongle } from "@/components/Font";
 import Link from 'next/link'
 import { Picture } from '@/components/Image'
 import texture1 from '../public/Img/bg_texture1.png'
+import { SignUp } from "./api/auth";
+import { db } from "@/config/firebaseSetup";
+import { collection, getCountFromServer, query, where } from "firebase/firestore";
 const style = css`
 
     div{
@@ -48,11 +51,7 @@ export default function signUpPage() {
     const [u_password, setPassword] = useState("");
     const [notice, setNotice] = useState("");
     const router = useRouter();
-
-    const { addDoc, collection, query, where, getCountFromServer } = require("firebase/firestore");
-    const { db } = require("../config/firebaseSetup")
-    const { SignUp } = require('./api/auth');
-
+    
     async function formHandler (e) {
         e.preventDefault();
         const q = query(collection(db, "users"), where("username", "==", u_username));

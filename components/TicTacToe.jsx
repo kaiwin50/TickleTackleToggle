@@ -6,6 +6,8 @@ import { Button } from "./Button";
 import { css } from 'styled-components'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, PictureFlex } from '@/components/Image'
+import { db } from "@/config/firebaseSetup";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 const style = css`
     .turnLabel {
         border-bottom-left-radius: 50px;
@@ -75,9 +77,6 @@ export const GameBox = styled(gameBox)`
     }
 `
 
-const { db } = require('@/config/firebaseSetup');
-const { doc, updateDoc, getDoc, collection, getDocs, deleteDoc } = require('firebase/firestore');
-
 function TicTacToe(rid, player, router) {
     const table = [
         { value: '', card: '', id: '0' }, { value: '', card: '', id: '1' }, { value: '', card: '', id: '2' },
@@ -134,7 +133,7 @@ function TicTacToe(rid, player, router) {
 
     const endPlay = async ()=>{
         room.destroy(rid, players);
-        router.push('../home')
+        router.push('/home')
       }
 
     const [roomRef, setRoomRef] = useState([]);
