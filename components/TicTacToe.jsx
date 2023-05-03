@@ -249,7 +249,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
         router.replace('/home')
     }
     const endPlay = async () => {
-        room.destroy(rid, player);
+        room.destroy(rid, player.id);
         router.replace('/home')
     }
     const deactivate = () => {

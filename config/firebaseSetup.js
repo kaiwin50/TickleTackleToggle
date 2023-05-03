@@ -8,14 +8,13 @@ import { getAuth } from 'firebase/auth';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 export const firebaseConfig = {
-  apiKey: "AIzaSyB_jU3ZQ3ALnbTmCb7j7H837TlJ-fy64oQ",
-  authDomain: "tickletackletoggle.firebaseapp.com",
-  databaseURL: "https://tickletackletoggle-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tickletackletoggle",
-  storageBucket: "tickletackletoggle.appspot.com",
-  messagingSenderId: "854577270606",
-  appId: "1:854577270606:web:b6bc3b049173e4c8d1981f",
-  measurementId: "G-8TFRCPFNQK"
+  apiKey: "AIzaSyBN0iMvyfxdV5bKdscKafqxgjPImu7HkpA",
+  authDomain: "tictactoe-4ec18.firebaseapp.com",
+  projectId: "tictactoe-4ec18",
+  storageBucket: "tictactoe-4ec18.appspot.com",
+  messagingSenderId: "668793574462",
+  appId: "1:668793574462:web:d60e68e845ac70239ded6f",
+  measurementId: "G-NM0CQHZG15"
 };
 
 // Initialize Firebase

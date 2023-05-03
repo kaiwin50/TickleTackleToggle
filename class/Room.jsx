@@ -48,6 +48,7 @@ export class Room {
     }
     subscribe(rid, setter, setPlayers, setBoard) {
         if (setter) {
+            console.log(rid)
             onSnapshot(doc(db, 'room', rid), async (snapshot) => {
                 setter({ ...snapshot.data(), id: snapshot.id })
                 const q = query(collection(doc(db, 'room', rid), 'players'))
@@ -130,12 +131,12 @@ export class Room {
         })
 
     }
-    destroy(rid, player) {
-        updateDoc(doc(db, 'users', player.id), {
+    destroy(rid, uid) {
+        updateDoc(doc(db, 'users', uid), {
             status: 'idle',
             inRoom: ''
         }).then(() => {
-            deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
+            deleteDoc(doc(doc(db, 'room', rid), 'players', uid));
         })
         updateDoc(doc(db, 'room', rid), {
             isFull: false
