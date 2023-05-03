@@ -30,7 +30,7 @@ export class Room {
     addPlayer(roomRef, userRef, type = 'matching') {
         setDoc(doc(roomRef, 'players', userRef.id), {
             username: userRef.username,
-            isReady: type == 'waiting rank' ? true : false
+            isReady: false
         })
         updateDoc(doc(collection(db, 'users'), userRef.id), {
             status: type,
@@ -101,105 +101,48 @@ export class Room {
             })
         }
     }
-    subscribeRank(rid, setter, setPlayers, setBoard) {
-        if (setter) {
-            onSnapshot(doc(db, 'rank', rid), async (snapshot) => {
-                setter({ ...snapshot.data(), id: snapshot.id })
-                const q = query(collection(doc(db, 'rank', rid), 'players'))
-                const playersNum = await getCountFromServer(q)
-                if (playersNum.data().count == 2) {
-                    updateDoc(doc(db, 'rank', rid), {
-                        isFull: true
-                    })
-                }
-                else if (playersNum.data().count < 2) {
-                    updateDoc(doc(db, 'rank', rid), {
-                        isFull: false
-                    })
-                }
-            })
-        }
-        if (setPlayers) {
-            onSnapshot(collection(doc(db, 'rank', rid), 'players'), async (snapshot) => {
-                try {
-                    const qReady = query(collection(doc(db, 'rank', rid), 'players'), where('isReady', '==', true));
-                    const playersReady = await getCountFromServer(qReady)
-                    console.log('ready: ', playersReady.data().count, rid)
-                    const isBothReady = playersReady.data().count == 2;
-                    setPlayers([])
-                    console.log(playersReady.data().count)
-                    snapshot.docs.forEach(playerDoc => {
-                        setPlayers(old => ([...old, playerDoc]))
-                        if (isBothReady) {
-                            console.log('in isBothReady', isBothReady)
-                            this.start(rid, snapshot, 'rank')
-                            updateDoc(doc(doc(db, 'rank', rid), 'players', playerDoc.id), {
-                                isReady: false
-                            })
-                            updateDoc(doc(db, 'users', playerDoc.id), {
-                                status: 'ranking'
-                            })
-                            updateDoc(doc(db, 'rank', rid), {
-                                status: 'playing'
-                            })
-
-                        }
-                    })
-                }
-                catch (e) {
-                    console.error('rank deleted');
-                }
-            })
-        }
-        if (setBoard) {
-            onSnapshot(collection(doc(db, 'rank', rid), 'board'), snapshot => {
-                const newData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-                setBoard(newData)
-            })
-        }
-    }
-    start(rid, playerSnap, type='room') {
+    start(rid, playerSnap) {
         (['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8']).forEach((value) => {
             const cards = ['Tickle', 'Tackle', 'Toggle'];
             let random = Math.floor(Math.random() * 3);
             console.log(random)
-            setDoc(doc(doc(db, type, rid), 'board', value), {
+            setDoc(doc(doc(db, 'room', rid), 'board', value), {
                 value: '',
                 card: cards[random]
             })
 
         })
-        updateDoc(doc(db, type, rid), {
+        updateDoc(doc(db, 'room', rid), {
             turn: 'O',
             winner: ''
         })
         playerSnap.docs.forEach((docRef, index) => {
-            updateDoc(doc(doc(db, type, rid), 'players', docRef.id), {
+            updateDoc(doc(doc(db, 'room', rid), 'players', docRef.id), {
                 role: index ? 'O' : 'X',
                 card: [],
                 activate: []
             })
         })
     }
-    subscribeUser(rid, uid, setter, type='room') {
-        onSnapshot(doc(doc(db, type, rid), 'players', uid), snapshot => {
+    subscribeUser(rid, uid, setter) {
+        onSnapshot(doc(doc(db, 'room', rid), 'players', uid), snapshot => {
             setter({ ...snapshot.data(), id: uid });
         })
 
     }
-    destroy(rid, player, type="room") {
+    destroy(rid, player) {
         updateDoc(doc(db, 'users', player.id), {
             status: 'idle',
             inRoom: ''
         }).then(() => {
-            deleteDoc(doc(doc(db, type, rid), 'players', player.id));
+            deleteDoc(doc(doc(db, 'room', rid), 'players', player.id));
         })
-        updateDoc(doc(db, type, rid), {
+        updateDoc(doc(db, 'room', rid), {
             isFull: false
         })
     }
-    surrender(rid, player, type='room') {
-        updateDoc(doc(db, type, rid), {
+    surrender(rid, player) {
+        updateDoc(doc(db, 'room', rid), {
             status: 'Game Over',
             winner: player.role == 'O' ? 'X' : 'O'
         })
