@@ -281,7 +281,8 @@ function TicTacToe(rid, player = { card: [] }, router) {
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
                 {(player.activate)?.map((cardName, index) => (
                     <li key={index} onClick={deactivate} >
-                        <img src={`/Img/${cardName}.png`} width="115.5px" height="162px"></img>
+                        
+                        <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
                     </li>
                 ))}
             </Container>
@@ -294,7 +295,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                     if (opponent.id != player.id && opponent.data().activate[0] != undefined) {
                         return (
                             <li key={index} onClick={deactivate} >
-                                <img src={`/Img/${(opponent.data().activate)[0]}.png`} width="115.5px" height="162px"></img>
+                                <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></embed>
                             </li>
                         )
                     }
@@ -316,7 +317,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                         borderBottomRight={id == 't8' ? '25px' : '0'}
                         fontColor={value == 'O' ? '#13ec9e' : '#8B89F7'}>
                         <p>{value}</p>
-                        <img src={`/Img/${card}.png`} width="77px" height="108px"></img>
+                        <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${card}.svg`} width="77px" height="108px"></embed>
                     </GameBox>
                 )
                 )}
@@ -324,7 +325,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
         <PlayerHand>
             {(player.card)?.map((cardName, index) => (
                 <li key={index} onClick={() => { useCard(cardName, index) }} >
-                    <img src={`/Img/${cardName}.png`} width="115.5px" height="162px"></img>
+                    <img src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></img>
                 </li>
             ))}
         </PlayerHand>
