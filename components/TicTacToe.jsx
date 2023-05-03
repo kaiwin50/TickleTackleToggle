@@ -281,7 +281,6 @@ function TicTacToe(rid, player = { card: [] }, router) {
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
                 {(player.activate)?.map((cardName, index) => (
                     <li key={index} onClick={deactivate} >
-                        
                         <img src={`/Img/${cardName}.png`} width="115.5px" height="162px"></img>
                     </li>
                 ))}
