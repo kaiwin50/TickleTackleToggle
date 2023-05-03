@@ -106,7 +106,7 @@ export default function signInPage() {
                       router.push('home');                    
                     }
                     else if(data.status == 'playing'){
-                      router.push(`../play/${data.inRoom}`);
+                      router.push(`/play/${data.inRoom}`);
                     }
                 })
             }

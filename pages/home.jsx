@@ -2,7 +2,7 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { css } from 'styled-components'
 import { Container, ContainerFluid } from '@/components/Container'
-// import { Button } from '@/components/Button'
+import { Button as BTN1 } from '@/components/Button'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { ChatApp, ChatLetter } from '@/components/Chat'
@@ -272,7 +272,7 @@ export default function Home() {
             setUserRef({ ...userInfo.data(), id: userInfo.id })
             const data = userInfo.data();
             console.log(data.status)
-            if (data.inRoom != '') {
+            if (data.inRoom != '' && data.status == 'matching') {
               console.log('is in room ', data.inRoom)
               room.subscribe(data.inRoom, setRoomRef, setPlayers);
               console.log(roomRef, players)
@@ -409,8 +409,8 @@ export default function Home() {
       }}>
         <div className='profileP'>
           <div className='profileImg'></div>
-          <h1 className={dongle.className} style={{ fontSize: '16px' }}>{userRef.username} </h1>
-          <h1 className={[dongle.className, "player_status"].join(" ")}>status </h1>
+          <h1 className={dongle.className} style={{ fontSize: '35px' }}>{userRef.username} </h1>
+          <h1 className={[dongle.className, "player_status"].join(" ")} style={{ fontSize: '35px' }}>status {userRef.status}</h1>
 
         </div>
         <div className='quick-match' onClick={matchingManager}>
@@ -460,8 +460,8 @@ export default function Home() {
               <Picture visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand1.png"} width="4.5em" bottom="-1em" right="-2em" transform="rotate(5deg);"></Picture>
               <h2 className="player_match_label mon2"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
           </Container>
-          <Button className={dongle.className} fontSize="1.5em" margin="37.5em" color="#ECC94B" onClick={userReady}>Ready </Button>
-          <Button className={dongle.className} fontSize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</Button>
+          <BTN1 className={dongle.className} fontsize="1.5em" margin="37.5em" color="#ECC94B" onClick={userReady}>Ready </BTN1>
+          <BTN1 className={dongle.className} fontsize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</BTN1>
         </ContainerFluid>
 
         {
