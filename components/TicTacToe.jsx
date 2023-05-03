@@ -316,7 +316,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                         borderBottomRight={id == 't8' ? '25px' : '0'}
                         fontColor={value == 'O' ? '#13ec9e' : '#8B89F7'}>
                         <p>{value}</p>
-                        <embed style={{ borderRadius: '10px', display: card == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${card}.svg`} width="77px" height="108px"></embed>
+                        <img src={`/Img/${card}.png`} width="77px" height="108px"></img>
                     </GameBox>
                 )
                 )}
