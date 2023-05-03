@@ -281,7 +281,8 @@ function TicTacToe(rid, player = { card: [] }, router) {
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
                 {(player.activate)?.map((cardName, index) => (
                     <li key={index} onClick={deactivate} >
-                        <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
+                        
+                        <img src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></img>
                     </li>
                 ))}
             </Container>
@@ -294,7 +295,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                     if (opponent.id != player.id && opponent.data().activate[0] != undefined) {
                         return (
                             <li key={index} onClick={deactivate} >
-                                <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></embed>
+                                <img src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></img>
                             </li>
                         )
                     }
@@ -324,7 +325,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
         <PlayerHand>
             {(player.card)?.map((cardName, index) => (
                 <li key={index} onClick={() => { useCard(cardName, index) }} >
-                    <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
+                    <img src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></img>
                 </li>
             ))}
         </PlayerHand>
