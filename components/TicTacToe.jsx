@@ -106,7 +106,7 @@ const PlayerHand = styled.ul`
 
 
 
-function TicTacToe(rid, player = { card: [] }, router) {
+function TicTacToe(rid, player = { card: [] }, router, type = 'room') {
     const table = [
         { value: '', card: 'none', id: '0' }, { value: '', card: 'none', id: '1' }, { value: '', card: 'none', id: '2' },
         { value: '', card: 'none', id: '3' }, { value: '', card: 'none', id: '4' }, { value: '', card: 'none', id: '5' },
@@ -121,7 +121,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
     const [opponent, setOpponent] = useState({})
 
     const check = async () => {
-        const updatedBoard = await getDocs(collection(doc(db, 'room', rid), 'board'));
+        const updatedBoard = await getDocs(collection(doc(db, type, rid), 'board'));
         const UBRef = updatedBoard.docs.map(doc => ({ id: doc.id, value: doc.data().value }))
         console.log(UBRef)
         var result;
@@ -130,7 +130,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
             const isOver = UBRef[lines[0]].value == UBRef[lines[1]].value && UBRef[lines[0]].value == UBRef[lines[2]].value && UBRef[lines[0]].value != ''
             if (isOver) {
                 result = isOver;
-                updateDoc(doc(db, 'room', rid), {
+                updateDoc(doc(db, type, rid), {
                     status: 'Game Over',
                     winner: UBRef[lines[0]].value
 
@@ -142,7 +142,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                 UBRef[3].value != '' && UBRef[4].value != '' && UBRef[5].value != '' && UBRef[6].value != '' &&
                 UBRef[7].value != '' && UBRef[8].value != ''
             if (isFull) {
-                updateDoc(doc(db, 'room', rid), {
+                updateDoc(doc(db, type, rid), {
                     winner: 'draw',
                     status: 'Game Over'
                 })
@@ -157,19 +157,19 @@ function TicTacToe(rid, player = { card: [] }, router) {
                 console.log(player.activate.length)
                 console.log((player.activate.length != 0 && value == (player.role == 'O' ? 'X' : 'O')))
                 if (player.activate.length == 0 && value == '') {
-                    const playerHand = await getDoc(doc(doc(db, 'room', rid), 'players', player.id))
+                    const playerHand = await getDoc(doc(doc(db, type, rid), 'players', player.id))
                     if (card != 'none') {
-                        updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+                        updateDoc(doc(doc(db, type, rid), 'players', player.id), {
                             card: [...playerHand.data().card, card]
                         })
                     }
-                    updateDoc(doc(doc(db, 'room', rid), 'board', id), {
+                    updateDoc(doc(doc(db, type, rid), 'board', id), {
                         value: player.role,
                         card: 'none'
                     })
 
                     check()
-                    updateDoc(doc(db, 'room', rid), {
+                    updateDoc(doc(db, type, rid), {
                         turn: player.role == 'O' ? 'X' : 'O'
                     })
                 }
@@ -179,35 +179,37 @@ function TicTacToe(rid, player = { card: [] }, router) {
                     switch (player.activate[0]) {
                         case 'Tickle':
                             if (value == (player.role == 'O' ? 'X' : 'O')) {
-                                updateDoc(doc(doc(db, 'room', rid), 'board', id), {
+                                updateDoc(doc(doc(db, type, rid), 'board', id), {
                                     value: player.role,
                                 })
                                 playerHand.splice(activateCardIndex, 1);
-                                updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+                                updateDoc(doc(doc(db, type, rid), 'players', player.id), {
                                     card: playerHand,
                                     activate: []
                                 })
                                 check()
-                                updateDoc(doc(db, 'room', rid), {
+                                updateDoc(doc(db, type, rid), {
                                     turn: player.role == 'O' ? 'X' : 'O'
                                 })
                             }
+
                             break;
                         case 'Tackle':
                             if (value == (player.role == 'O' ? 'X' : 'O')) {
-                                updateDoc(doc(doc(db, 'room', rid), 'board', id), {
+                                updateDoc(doc(doc(db, type, rid), 'board', id), {
                                     value: '',
                                 })
                                 playerHand.splice(activateCardIndex, 1);
-                                updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+                                updateDoc(doc(doc(db, type, rid), 'players', player.id), {
                                     card: playerHand,
                                     activate: []
                                 })
                                 check()
-                                updateDoc(doc(db, 'room', rid), {
+                                updateDoc(doc(db, type, rid), {
                                     turn: player.role == 'O' ? 'X' : 'O'
                                 })
                             }
+
                             break;
                         case 'Toggle':
                             if (value == (player.role != 'O' ? 'X' : 'O') && toggleSelect.length == 0) {
@@ -216,19 +218,19 @@ function TicTacToe(rid, player = { card: [] }, router) {
                             else if (value == (player.role == 'O' ? 'X' : 'O') && toggleSelect.length == 1) {
                                 setToggleSelect((old) => [...old, { 'id': id, 'value': value }]);
                                 console.log(toggleSelect)
-                                updateDoc(doc(doc(db, 'room', rid), 'board', toggleSelect[0].id), {
+                                updateDoc(doc(doc(db, type, rid), 'board', toggleSelect[0].id), {
                                     value: value
                                 })
-                                updateDoc(doc(doc(db, 'room', rid), 'board', id), {
+                                updateDoc(doc(doc(db, type, rid), 'board', id), {
                                     value: toggleSelect[0].value
                                 })
                                 playerHand.splice(activateCardIndex, 1);
-                                updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+                                updateDoc(doc(doc(db, type, rid), 'players', player.id), {
                                     card: playerHand,
                                     activate: []
                                 })
                                 check()
-                                updateDoc(doc(db, 'room', rid), {
+                                updateDoc(doc(db, type, rid), {
                                     turn: player.role == 'O' ? 'X' : 'O'
                                 })
                                 setToggleSelect([])
@@ -243,20 +245,20 @@ function TicTacToe(rid, player = { card: [] }, router) {
     }
 
     const surrender = async () => {
-        room.surrender(rid, player);
+        room.surrender(rid, player, type);
         router.replace('/home')
     }
     const endPlay = async () => {
-        room.destroy(rid, player.id);
+        room.destroy(rid, player, type);
         router.replace('/home')
     }
     const deactivate = () => {
-        updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+        updateDoc(doc(doc(db, type, rid), 'players', player.id), {
             activate: []
         })
     }
     const useCard = (card, index) => {
-        updateDoc(doc(doc(db, 'room', rid), 'players', player.id), {
+        updateDoc(doc(doc(db, type, rid), 'players', player.id), {
             activate: [card]
         })
         setActivateCardIndex(index)
@@ -266,7 +268,12 @@ function TicTacToe(rid, player = { card: [] }, router) {
     const [players, setPlayers] = useState([]);
     useEffect(() => {
         if (router.isReady) {
-            room.subscribe(rid, setRoomRef, setPlayers, setBoardRef)
+            if (type == 'room') {
+                room.subscribe(rid, setRoomRef, setPlayers, setBoardRef)
+            }
+            else {
+                room.subscribeRank(rid, setRoomRef, setPlayers, setBoardRef)
+            }
         }
     }, [router.isReady])
     return (<>
@@ -279,8 +286,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
             <Container width="40%" height="60%" padding="0" color="#FFFFFF" border="3px solid #000000" shadow="8px 4px 3px rgba(0, 0, 0, 0.25)" bdradius="20px" mgtop="-3em">
                 {(player.activate)?.map((cardName, index) => (
                     <li key={index} onClick={deactivate} >
-                        
-                        <embed style={{ borderRadius: '10px', display: cardName == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
+                        <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
                     </li>
                 ))}
             </Container>
@@ -293,7 +299,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
                     if (opponent.id != player.id && opponent.data().activate[0] != undefined) {
                         return (
                             <li key={index} onClick={deactivate} >
-                                <embed style={{ borderRadius: '10px', display: opponent.data().activate[0] == 'none' ? 'none' : 'unset', pointerEvents: 'none' }} src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></embed>
+                                <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${(opponent.data().activate)[0]}.svg`} width="115.5px" height="162px"></embed>
                             </li>
                         )
                     }
@@ -323,7 +329,7 @@ function TicTacToe(rid, player = { card: [] }, router) {
         <PlayerHand>
             {(player.card)?.map((cardName, index) => (
                 <li key={index} onClick={() => { useCard(cardName, index) }} >
-                    <img src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></img>
+                    <embed style={{ borderRadius: '10px', pointerEvents: 'none' }} src={`/Img/${cardName}.svg`} width="115.5px" height="162px"></embed>
                 </li>
             ))}
         </PlayerHand>
@@ -335,8 +341,8 @@ function TicTacToe(rid, player = { card: [] }, router) {
             <Container width="100%" color="transparent" visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'}>
                 <div style={{ paddingTop: '10vh', width: '37.5vw', height: '37.5vw', background: '#ffffffa6', borderRadius: '50%', boxShadow: '0px 12px 5px #000000a1', justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
                     <PictureFlex visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? 'win' : 'lose'}.png`} width="40%"></PictureFlex>
-                    <h1 className={heyComic.className} style={{ paddingTop: '17vh'}}>{roomRef.winner == player.role ? 'Victory !' : 'Defeat'}</h1>
-                    <h1 className={heyComic.className} style={{ paddingTop: '17vh'}}>{player?.role}</h1>
+                    <h1 className={heyComic.className} style={{ paddingTop: '17vh' }}>{roomRef.winner == player.role ? 'Victory !' : 'Defeat'}</h1>
+                    <h1 className={heyComic.className} style={{ paddingTop: '17vh' }}>{player?.role}</h1>
                 </div>
             </Container>
             <Button color="#805AD5" className={dongle.className} fontsize="2em" bdradius="6px" hovercolor="#543b8c" fontcolor="white" onClick={endPlay}>Home</Button>
