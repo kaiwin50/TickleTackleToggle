@@ -85,8 +85,8 @@ export default function signInPage() {
             SignIn(userDoc.email, u_password, router);
         }
         catch (e) {
-            setNotice("username or password is incorrect.");
-            console.error("username or password is incorrect. :", e)
+            setNotice(e);
+            console.error('wrong!!', e)
         }
     }
     useEffect(()=>{

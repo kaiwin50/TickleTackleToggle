@@ -443,7 +443,7 @@ export default function Home() {
             <Modal key={index} closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
               <ModalContent>
-                <ModalHeader>Invitation from {inv.inviter}</ModalHeader>
+                <ModalHeader background={'#ECD352'}>Invitation from {inv.inviter}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={6}>
                 </ModalBody>
