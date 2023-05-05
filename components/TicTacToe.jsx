@@ -57,8 +57,8 @@ const gameBox = ({ className, children, props, onClick }) => (
 );
 
 export const GameBox = styled(gameBox)`
-    width: 1em;
-    height: 1em;
+    width: 33.33%;
+    height: 33.33%;
     background-color: ${props => props.color || "white"};
     border : 2px solid #2724B2;
     display: inline-flex;

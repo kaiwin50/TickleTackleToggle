@@ -35,7 +35,7 @@ const ChatProfileImg = styled.img`
 `
 const ChatContainer = styled.div`
     width: 22.5em;
-    height: 40%;
+    height: ${props => props.height };
     position: fixed;
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid #000000;
@@ -167,7 +167,7 @@ export const ChatApp = (userRef, router, roomId) => {
 
   return (
     <>
-    <ChatContainer top={ (router.pathname)?.split('/')[1] == 'play' ? '0' : 'null' }>
+    <ChatContainer top={ (router.pathname)?.split('/')[1] == 'play' ? '0' : 'null' } bottom={ (router.pathname)?.split('/')[1] == 'createRoom' ? '0' : '21%' } height={ (router.pathname)?.split('/')[1] == 'createRoom' ? '30%' : '40%' }>
       <div style={{position: 'absolute', height: '90%', top: '0', overflowY: 'auto', width: '100%'}}>
         {allMsg?.map((chat, index) => {
           return (

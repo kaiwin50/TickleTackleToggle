@@ -271,18 +271,19 @@ export default function Home() {
           setUid(user.uid)
           onSnapshot(doc(db, 'users', user.uid), async (userInfo) => {
             setUserRef({ ...userInfo.data(), id: userInfo.id })
+            const data = userInfo.data();
             // console.log(data.status)
             // if (data.inRoom != '' && data.status == 'matching') {
             //   console.log('is in room ', data.inRoom)
             //   room.subscribe(data.inRoom, setRoomRef, setPlayers);
             //   console.log(roomRef, players)
             // }
-            // if (data.status == 'idle') {
-            //   router.push('/home');
-            // }
-            // else if (data.status == 'playing') {
-            //   router.push(`/play/${data.inRoom}`);
-            // }
+            if (data.status == 'idle') {
+              router.push('/home');
+            }
+            else if (data.status == 'playing') {
+              router.push(`/play/${data.inRoom}`);
+            }
           })
           onSnapshot(collection(doc(db, 'users', user.uid), 'invite'), inviteDoc => {
               onOpen();
@@ -433,7 +434,6 @@ export default function Home() {
         <ChatLetter className={dongle.className} left="1.75em" transform="rotate(7.27deg)">a</ChatLetter>
         <ChatLetter className={dongle.className} left="2.25em" transform="rotate(-8deg)">t</ChatLetter>
         <Picture src={"/Img/chat_mouth.png"} width="4.5em" top="36%" left="16em"></Picture>
-        { Matching(userRef, players) }
 
         {
           inviteRef?.map((inv, index) => (
@@ -474,9 +474,11 @@ export default function Home() {
           <Button onClick={matchingManager} w='full' size='lg' bg='#FF6839' color='white'>Match</Button>
           <Link href="/rank"><Button w='full' bg='#EC8F4B' color='white'>Rank</Button></Link>
           <Button onClick={createRoom} w='full' bg='#ECC94B' color='white'>Create Room</Button>
-          <Button w='full' bg='#85847B' color='white'>Sign out</Button>
+          <Button w='full' bg='#85847B' color='white' onClick={ ()=>{SignOut(router)} }>Sign out</Button>
         </Flex>
       </Flex>
+      { Matching(userRef, players) }
+
     </>
   )
 }

@@ -247,10 +247,10 @@ export default function CreateRoom() {
                             <Button onClick={ready} padding="2em" className={dongle.className} color="#ECC94B" fontsize="2em" border="1px solid #000000">Ready</Button>
                         </Container>
                     </Container>
-                    <Container width="25%" height="130%" bdradius="10px" color="white" shadow="6px 6px 1px 4px rgba(0, 0, 0, 0.5)" mgtop="-4em">
+                    <Container width="25vw" padding="0" height="90vh" bdradius="10px" color="white" shadow="6px 6px 1px 4px rgba(0, 0, 0, 0.5)" mgtop="-4em">
                         <PictureFlex src={"/Img/online.png"} width="90%" mtop="0"></PictureFlex>
-                        <Container width="90%" height="30vh" bdradius="10px" color="#ECD352" border="3px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)">
-                            <Container width="100%" overflowy='auto' height="100%" bdradius="15px" color="rgba(255, 253, 253, 0.6)" border="2px solid #000000" shadow="px 6px 4px rgba(0, 0, 0, 0.25)">
+                        <Container width="90%" height="70vh" bdradius="10px" color="#ECD352" border="3px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)">
+                            <Container alignItems='unset' width="100%" overflowy='auto' height="100%" bdradius="15px" color="rgba(255, 253, 253, 0.6)" border="2px solid #000000" shadow="px 6px 4px rgba(0, 0, 0, 0.25)">
                                 {
                                     friends?.map((fr, index) => (
                                         <Container key={index} width="100%" className="row" bdradius="10px" mgtop='1em' color="rgba(255, 252, 252, 0.6)">
@@ -268,12 +268,9 @@ export default function CreateRoom() {
                                 }
                             </Container>
                         </Container>
-                        <PictureFlex src={"/Img/chat.png"} width="80%" mtop="0"></PictureFlex>
-                        <Container width="90%" height="30%" bdradius="10px" color="#ECD352" border="3px solid #000000" shadow="0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06)" mgtop="-2em">
-
-                        </Container>
                     </Container>
                 </Container>
+                { ChatApp(userRef, router, rid) }
 
 
 

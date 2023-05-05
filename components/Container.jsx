@@ -11,7 +11,7 @@ const Box = ({ className, children, props }) => (
 const Container = styled(Box)`
   background-color: ${props => props.color || "#3e2b85"};
   justify-content:  ${props => props.justify || "center"}; 
-  align-items: center;
+  align-items: ${props => props.alignItems || "center"};
   width: ${props => props.width || "fit-content"};
   height: ${props => props.height || "fit-content"};
   padding: ${props => props.padding || "1em"};

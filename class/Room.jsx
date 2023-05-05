@@ -85,7 +85,6 @@ export class Room {
                             updateDoc(doc(db, 'room', rid), {
                                 status: 'playing'
                             })
-
                         }
                     })
                 }
