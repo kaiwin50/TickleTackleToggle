@@ -15,8 +15,11 @@ import Link from 'next/link'
 import texture1 from '../public/Img/bg_texture1.png'
 import { db } from '@/config/firebaseSetup'
 import { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer, deleteDoc } from 'firebase/firestore'
+import { signOut } from 'firebase/auth'
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, useDisclosure } from '@chakra-ui/react'
 import Matching from '@/components/Matching'
+import { Avatar, Flex, Text } from '@chakra-ui/react';
+
 const style = css`
   /* input[name='msg']{
     width: 100%;
@@ -398,17 +401,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <style>{style}</style>
       </Head>
-      <main id='re' className={styles.main} style={{
-        backgroundImage: `url(${texture1.src})`,
-        height: '100vh',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-      }}>
-        <div className='profileP'>
+      <Flex bgColor="#8B89F7" display={['none', 'none', 'none', 'flex']} bgImage="/Img/bg_texture1.png" bgRepeat="no-repeat" bgSize="cover" w="full" h="100vh" justify="center" align="flex-end">
+        <div className='profileP' style={{ paddingLeft: '1rem' }}>
           <div className='profileImg'></div>
-          <h1 className={dongle.className} style={{ fontSize: '35px' }}>{userRef.username} </h1>
-          <h1 className={[dongle.className, "player_status"].join(" ")} style={{ fontSize: '35px' }}>status { userRef.status }</h1>
-
+          <Text className={dongle.className} fontSize='4xl'>{userRef.username}</Text>
+          <Text className={dongle.className} fontSize='2xl'>status {userRef.status}</Text>
         </div>
         <div className='quick-match' onClick={matchingManager}>
           <div className={dongle.className}>Match</div>
@@ -458,8 +455,28 @@ export default function Home() {
             </Modal>
           ))
         }
-
-      </main>
+      </Flex>
+      <Flex bgColor="#8B89F7" display={['flex', 'flex', 'flex', 'none']} bgImage="/Img/bg_texture1.png" bgRepeat="no-repeat" bgSize="cover" w="full" h="100vh" justify="center" align="center">
+        <Avatar position='absolute' name={userRef.username} width='24' height='24' top='8' left='8' />
+        <Link href='/leaderboard'>
+          <div className='leader-btn'>
+            <Picture src={"/Img/hand1.png"} width="3.5em" top=".1em" left="2em"></Picture>
+            <h1 className={dongle.className}>Leaderboard</h1>
+          </div>
+        </Link>
+        <Link href='/friends'>
+          <div className='friend-btn'>
+            <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>
+            <h1 className={dongle.className}>Friends</h1>
+          </div>
+        </Link>
+        <Flex direction='column' w={['80%', 'full']} maxW='md' gap='4'>
+          <Button onClick={matchingManager} w='full' size='lg' bg='#FF6839' color='white'>Match</Button>
+          <Link href="/rank"><Button w='full' bg='#EC8F4B' color='white'>Rank</Button></Link>
+          <Button onClick={createRoom} w='full' bg='#ECC94B' color='white'>Create Room</Button>
+          <Button w='full' bg='#85847B' color='white'>Sign out</Button>
+        </Flex>
+      </Flex>
     </>
   )
 }
