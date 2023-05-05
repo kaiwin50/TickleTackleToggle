@@ -115,7 +115,7 @@ export default function Home() {
   // query url data
   const router = useRouter();
   const { rid } = router.query;
-  const user = new User();
+  const userC = new User();
   const room = new Room();
   const [uid, setUid] = useState('');
   const [player, setPlayer] = useState({})
@@ -124,28 +124,28 @@ export default function Home() {
   const [userRef, setUserRef] = useState({});
 
   useEffect(() => {
-    if(router.isReady){
+    if (router.isReady) {
       try {
-      setUid(auth.currentUser.uid)
-      user.startSnapshot(uid, setUserRef);
-      room.subscribeUser(rid, uid, setPlayer, 'rank');
+        setUid(auth.currentUser.uid)
+        userC.startSnapshot(uid, setUserRef);
+        room.subscribeUser(rid, uid, setPlayer, 'rank');
+      }
+      catch (e) {
+        auth.onAuthStateChanged(user => {
+          if (user) {
+            console.log('user: ', user)
+            room.subscribeUser(rid, user.uid, setPlayer, 'rank');
+            userC.startSnapshot(user.uid, setUserRef);
+            console.log(player)
+            console.log('...')
+          }
+          else {
+            console.log(null);
+          }
+        })
+      }
     }
-    catch (e) {
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          console.log('user: ', user)
-          room.subscribeUser(rid, user.uid, setPlayer);
-          onSnapshot(doc(db, 'users', user.uid), userInfo => {
-            setUserRef({ ...userInfo.data(), id: userInfo.id })
-          })
-        }
-        else {
-          console.log(null);
-        }
-      })
-    }
-    }
-    
+
   }, [router.isReady])
 
 
@@ -159,22 +159,22 @@ export default function Home() {
         <style>{style}</style>
       </Head>
       <main className={styles.main} style={{
-      backgroundImage: `url(${texture3.src})`,
-      height: '100vh',
-      backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    }}>
-      <ContainerAbsolute className="name_match" bottom="2.5%" left="4%" color="transparent" zindex="3">
-        <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
-          <PictureFlex src={"/Img/monster1.png"} width="5em"></PictureFlex>
-        </Container>
-        <h3 className={dongle.className}>Player : {userRef.username}</h3>
-      </ContainerAbsolute>
-      <ContainerAbsolute className="name_match" top="3%" right="3%" color="transparent" zindex="3">
-        <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
-          <PictureFlex src={"/Img/monster2.png"} width="2.5em"></PictureFlex>
-        </Container>
-      </ContainerAbsolute>
+        backgroundImage: `url(${texture3.src})`,
+        height: '100vh',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+      }}>
+        <ContainerAbsolute className="name_match" bottom="2.5%" left="4%" color="transparent" zindex="3">
+          <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
+            <PictureFlex src={"/Img/monster1.png"} width="5em"></PictureFlex>
+          </Container>
+          <h3 className={dongle.className}>Player : {userRef.username}</h3>
+        </ContainerAbsolute>
+        <ContainerAbsolute className="name_match" top="3%" right="3%" color="transparent" zindex="3">
+          <Container width="6em" height="6em" bdradius="50%" color="white" border="3px solid #000000">
+            <PictureFlex src={"/Img/monster2.png"} width="2.5em"></PictureFlex>
+          </Container>
+        </ContainerAbsolute>
         {TicTacToe(rid, player, router, 'rank')}
         {/* <div>{ChatApp(userRef, router, rid)}</div> */}
       </main>

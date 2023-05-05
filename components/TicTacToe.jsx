@@ -9,7 +9,7 @@ import { css } from 'styled-components'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, PictureFlex } from '@/components/Image'
 import { db } from "@/config/firebaseSetup";
-import { collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, updateDoc } from "firebase/firestore";
 const style = css`
     .turnLabel {
         border-bottom-left-radius: 50px;
@@ -133,8 +133,69 @@ function TicTacToe(rid, player = { card: [] }, router, type = 'room') {
                 updateDoc(doc(db, type, rid), {
                     status: 'Game Over',
                     winner: UBRef[lines[0]].value
-
                 })
+                if (type == 'rank') {
+                    players.forEach(async (p) => {
+                        if (p.data().role == UBRef[lines[0]].value) {
+                            const goal = {
+                                'koy': {
+                                    'point': 3,
+                                    'upper': 'nang'
+                                }, 'nang': {
+                                    'point': 6,
+                                    'upper': 'kang'
+                                }, 'kang': {
+                                    'point': 12,
+                                    'upper': 'shie'
+                                }, 'shie': {
+                                    'point': 24,
+                                    'upper': 'pong'
+                                }, 'pong': {
+                                    'point': 999,
+                                    'upper': 'pong'
+                                }
+                            }
+                            const pDoc = await getDoc(doc(db, 'users', p.id))
+                            let newPoint = pDoc.data().rank.point + 1;
+                            let newTitle = newPoint > goal[pDoc.data().rank.title].point ? goal[pDoc.data().rank.title].upper : pDoc.data().rank.title;
+                            updateDoc(doc(db, 'users', p.id), {
+                                rank: {
+                                    title: newTitle,
+                                    point: newPoint
+                                }
+                            })
+                        }
+                        else {
+                            const goal = {
+                                'koy': {
+                                    'point': 0,
+                                    'lower': 'koy'
+                                }, 'nang': {
+                                    'point': 4,
+                                    'lower': 'koy'
+                                }, 'kang': {
+                                    'point': 7,
+                                    'lower': 'nang'
+                                }, 'shie': {
+                                    'point': 13,
+                                    'lower': 'kang'
+                                }, 'pong': {
+                                    'point': 25,
+                                    'lower': 'shie'
+                                }
+                            }
+                            const pDoc = await getDoc(doc(db, 'users', p.id))
+                            let newPoint = pDoc.data().rank.point != 0 ? pDoc.data().rank.point - 1 : 0;
+                            let newTitle = newPoint < goal[pDoc.data().rank.title].point ? goal[pDoc.data().rank.title].lower : pDoc.data().rank.title;
+                            updateDoc(doc(db, 'users', p.id), {
+                                rank: {
+                                    title: newTitle,
+                                    point: newPoint
+                                }
+                            })
+                        }
+                    })
+                }
             }
         })
         if (!result) {
@@ -340,7 +401,7 @@ function TicTacToe(rid, player = { card: [] }, router, type = 'room') {
             <Picture visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? 'bg_win' : 'bg_lose'}.png`} width="100%" height="100%" top="0" left="0"></Picture>
             <Container width="100%" color="transparent" visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'}>
                 <div style={{ paddingTop: '10vh', width: '37.5vw', height: '37.5vw', background: '#ffffffa6', borderRadius: '50%', boxShadow: '0px 12px 5px #000000a1', justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-                    <PictureFlex visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? 'win' : 'lose'}.png`} width="40%"></PictureFlex>
+                    <PictureFlex visible={roomRef ? (roomRef.winner == '' ? 'hidden' : 'visible') : 'hidden'} src={`/Img/${roomRef.winner == player.role ? (type == 'rank' ? 'star' : 'win') : (type == 'rank' ? 'HB' : 'lose')}.png`} width="40%"></PictureFlex>
                     <h1 className={heyComic.className} style={{ paddingTop: '17vh' }}>{roomRef.winner == player.role ? 'Victory !' : 'Defeat'}</h1>
                     <h1 className={heyComic.className} style={{ paddingTop: '17vh' }}>{player?.role}</h1>
                 </div>

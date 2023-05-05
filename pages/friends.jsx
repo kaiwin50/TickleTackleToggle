@@ -85,9 +85,9 @@ export default function Friends() {
             })
         }
     }
-    const acceptFriend = async (id) => {
+    const acceptFriend = async (id, name) => {
         setDoc(doc(doc(db, 'users', userRef.id), 'friend', id), {
-            username: userRef.username,
+            username: name,
             rank: userRef.rank
         })
         setDoc(doc(doc(db, 'users', id), 'friend', userRef.id), {
@@ -157,7 +157,7 @@ export default function Friends() {
                             <Container className="searchBar" width="40%" color="transparent" justify="start">
                                 {/* <h4>Add Friend</h4> */}
                                 <input placeholder='Username' className={dongle.className} onChange={(e) => { setInputVal(e.currentTarget.value) }}></input>
-                                <button onClick={addFriend}>add Friend </button>
+                                <Button colorScheme='green' onClick={addFriend}> + </Button>
                             </Container>
                         </Container>
                         <Link href='/home'><CloseBtn className={dongle.className} right="-.5em">x</CloseBtn></Link>
@@ -179,7 +179,7 @@ export default function Friends() {
                                             </Container>
                                             <Container width="20%" color="transparent" bdradius="0px" >
                                                 <Stack direction='row' spacing={4}>
-                                                    <Button visibility={state != 'friend' ? 'visible' : 'hidden'} onClick={() => { acceptFriend(fr.id) }} colorScheme='green' variant='solid'>
+                                                    <Button visibility={state != 'friend' ? 'visible' : 'hidden'} onClick={() => { acceptFriend(fr.id, fr.username) }} colorScheme='green' variant='solid'>
                                                     Accept
                                                     </Button>
                                                     <Button visibility={state != 'friend' ? 'visible' : 'hidden'} onClick={() => { reject(fr.id) }} colorScheme='red' variant='solid'>

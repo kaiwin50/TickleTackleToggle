@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { ChatApp, ChatLetter } from '@/components/Chat'
 import { User } from '@/class/User'
 import { Room } from '@/class/Room'
-import auth from './api/auth'
+import auth, { SignOut } from './api/auth'
 import { dongle, heyComic } from '@/components/Font'
 import { Picture, Background, PictureFlex } from '@/components/Image'
 import Link from 'next/link'
@@ -16,7 +16,7 @@ import texture1 from '../public/Img/bg_texture1.png'
 import { db } from '@/config/firebaseSetup'
 import { collection, doc, getDoc, updateDoc, onSnapshot, limit, query, where, getCountFromServer, deleteDoc } from 'firebase/firestore'
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, useDisclosure } from '@chakra-ui/react'
-
+import Matching from '@/components/Matching'
 const style = css`
   /* input[name='msg']{
     width: 100%;
@@ -179,8 +179,6 @@ const style = css`
     background-color: #e8c305;
     cursor: pointer;
   }
-  
-
   .matching h1{
     color: white;
     width: 40%;
@@ -252,7 +250,7 @@ export default function Home() {
   // query url data
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const [friendReqNum, setFriendReqNum] = useState(0) 
   // user refference : use as refference of realtime update user info.
   const [userRef, setUserRef] = useState({})
   const [inviteRef, setInviteRef] = useState([])
@@ -268,26 +266,30 @@ export default function Home() {
         if (user) {
           console.log('user: ', user)
           setUid(user.uid)
-          onSnapshot(doc(db, 'users', user.uid), userInfo => {
+          onSnapshot(doc(db, 'users', user.uid), async (userInfo) => {
             setUserRef({ ...userInfo.data(), id: userInfo.id })
-            const data = userInfo.data();
-            console.log(data.status)
-            if (data.inRoom != '' && data.status == 'matching') {
-              console.log('is in room ', data.inRoom)
-              room.subscribe(data.inRoom, setRoomRef, setPlayers);
-              console.log(roomRef, players)
-            }
-            if (data.status == 'idle') {
-              router.push('/home');
-            }
-            else if (data.status == 'playing') {
-              router.push(`/play/${data.inRoom}`);
-            }
+            // console.log(data.status)
+            // if (data.inRoom != '' && data.status == 'matching') {
+            //   console.log('is in room ', data.inRoom)
+            //   room.subscribe(data.inRoom, setRoomRef, setPlayers);
+            //   console.log(roomRef, players)
+            // }
+            // if (data.status == 'idle') {
+            //   router.push('/home');
+            // }
+            // else if (data.status == 'playing') {
+            //   router.push(`/play/${data.inRoom}`);
+            // }
           })
           onSnapshot(collection(doc(db, 'users', user.uid), 'invite'), inviteDoc => {
               onOpen();
               setInviteRef(inviteDoc.docs.map(fr => ({ ...fr.data(), id: fr.id })))
           });
+          onSnapshot(collection(doc(db, 'users', user.uid), 'request'), async () => {
+            const q = query(collection(doc(db, 'users', user.uid), 'request'));
+            const qCount = await getCountFromServer(q)
+            setFriendReqNum(qCount.data().count)
+          })
         }
         else {
           console.log(null);
@@ -356,11 +358,7 @@ export default function Home() {
   // }, [userRef.inRoom])
 
   // get confirm from user if they want to play the match
-  const userReady = () => {
-    updateDoc(doc(doc(db, 'room', userRef.inRoom), 'players', uid), {
-      isReady: true
-    })
-  }
+
   const createRoom = async () => {
     const newRoom = await room.create(userRef.rank.title, false, userRef.id)
     room.addPlayer(doc(db, 'room', newRoom.id), userRef, 'in room')
@@ -391,7 +389,6 @@ export default function Home() {
   }, [roomRef])
 
 
-  const destroyRoom = () => (room.destroy(userRef.inRoom, userRef.id))
   return (
     <>
       <Head>
@@ -410,7 +407,7 @@ export default function Home() {
         <div className='profileP'>
           <div className='profileImg'></div>
           <h1 className={dongle.className} style={{ fontSize: '35px' }}>{userRef.username} </h1>
-          <h1 className={[dongle.className, "player_status"].join(" ")} style={{ fontSize: '35px' }}>status </h1>
+          <h1 className={[dongle.className, "player_status"].join(" ")} style={{ fontSize: '35px' }}>status { userRef.status }</h1>
 
         </div>
         <div className='quick-match' onClick={matchingManager}>
@@ -430,39 +427,16 @@ export default function Home() {
         <Link href='/friends'><div className='friend-btn'>
           <Picture src={"/Img/hand3.png"} width="3.2em" top=".1em" right="6em"></Picture>
           <h1 className={dongle.className}>Friends</h1>
+          <div style={{ position:'absolute',top: '-5px', right: '-5px', visibility: friendReqNum ? 'visible' : 'hidden', width: '25px', height:'25px', background:'#FF6839', borderRadius: '50%', display: 'flex', justifyContent: 'center' }}> { friendReqNum } </div>
         </div></Link>
-
+        <Button maxW={'xs'} borderRadius={ '50' } position={'absolute'} top="2em" right="-2em" w="full" padding={'40px'} onClick={ ()=>{SignOut(router)} }> Sign Out </Button>
         {ChatApp(userRef, router, 'homePage')}
         <ChatLetter className={dongle.className} left=".75em" transform="rotate(-18.73deg)">C</ChatLetter>
         <ChatLetter className={dongle.className} left="1.25em" transform="rotate(-13.91deg)">h</ChatLetter>
         <ChatLetter className={dongle.className} left="1.75em" transform="rotate(7.27deg)">a</ChatLetter>
         <ChatLetter className={dongle.className} left="2.25em" transform="rotate(-8deg)">t</ChatLetter>
         <Picture src={"/Img/chat_mouth.png"} width="4.5em" top="36%" left="16em"></Picture>
-
-        <ContainerFluid className="matching" width="100vw" height="100vh" visible={userRef.status == 'matching' ? 'visible' : 'hidden'}>
-          <Background src={"/Img/match_bg.png"}></Background>
-          <h1 visible={players[0] != undefined ? 'hidden' : 'visible'} className={dongle.className}>Matching...</h1>
-
-          <Container color="transparent" visible={players[0] != undefined ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
-            <Container className={dongle.className} visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-              <PictureFlex visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster1.png"} width="80%" mbottom="0" transform="rotate(12.1deg)"></PictureFlex>
-              <Picture visible={(userRef.status == 'matching' && players[0] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand4.png"} width="6em" bottom="-2em" left="-3em" transform="rotate(-10deg);"></Picture>
-              <h2 className="player_match_label"><p>Player 1 </p><p className='player_match_name'>{userRef.inRoom != '' ? players[0]?.data().username : null}</p></h2></Container>
-          </Container>
-
-          <Container color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="20%">
-            <Picture src={"/Img/vs.png"} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="10em" top="-2em" left="4em" transform="rotate(12.1deg)"></Picture>
-          </Container>
-
-          <Container zindex="3" color="transparent" visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="40%" padding="0em" height="60%">
-            <Container className={dongle.className} visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} width="50%" height="100%" color="white" border="3px solid #000000" shadow="0px 9px 4px rgba(0, 0, 0, 0.35)">
-              <PictureFlex visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/monster2.png"} width="60%" mbottom="5em" ></PictureFlex>
-              <Picture visible={(userRef.status == 'matching' && players[1] != undefined) ? 'visible' : 'hidden'} src={"/Img/hand1.png"} width="4.5em" bottom="-1em" right="-2em" transform="rotate(5deg);"></Picture>
-              <h2 className="player_match_label mon2"><p>Player 2</p><p className='player_match_name'>{userRef.inRoom != '' ? players[1]?.data().username : null}</p></h2></Container>
-          </Container>
-          <BTN4 className={dongle.className} fontsize="1.5em" margin="37.5em" color="#ECC94B" onClick={userReady}>Ready </BTN4>
-          <BTN4 className={dongle.className} fontsize="1.5em" margin="2em" color="#9F7AEA" onClick={destroyRoom}>Cancel</BTN4>
-        </ContainerFluid>
+        { Matching(userRef, players) }
 
         {
           inviteRef?.map((inv, index) => (

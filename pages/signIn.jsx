@@ -101,13 +101,12 @@ export default function signInPage() {
                 console.log('user: ', user)
                 onSnapshot(doc(db, 'users', user.uid), userInfo => {
                     const data = userInfo.data();
-                    console.log(data)
-                    if(data.status == 'idle'){
-                      router.push('/home');                    
-                    }
-                    else if(data.status == 'playing'){
-                      router.push(`../play/${data.inRoom}`);
-                    }
+                    // if(data.status == 'idle'){
+                    //   router.push('/home');                    
+                    // }
+                    // else if(data.status == 'playing'){
+                    //   router.push(`../play/${data.inRoom}`);
+                    // }
                 })
             }
             else{

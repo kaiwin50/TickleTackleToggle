@@ -7,7 +7,7 @@ const Btn = ({className, children, onClick}) => (
 );
 
 const Button = styled(Btn)`
-  position: relative;
+  position: ${props => props.pos || "relative"};
   background-color : ${props => props.color || "goldenrod"};
   padding: .5em 1em;
   border-radius: ${props => props.bdradius || ".5em"};
@@ -16,10 +16,14 @@ const Button = styled(Btn)`
   cursor: pointer;
   font-size: ${props => props.fontsize || "1em"};
   color : ${props => props.fontcolor || "black"};
+  top: ${props => props.top };
+  bottom: ${props => props.bottom };
+  left: ${props => props.left };
+  right: ${props => props.right };
   margin-left: ${props => props.margin};
   &:hover{
     background-color : ${props => props.hovercolor || "#c1972d"};
-    top: 2px;
+    translate: 0 2px;
     filter: drop-shadow(0 3px rgba(0, 0, 0, 0.25));
   }
 `

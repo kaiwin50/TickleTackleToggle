@@ -1,15 +1,28 @@
 import { auth, db } from '@/config/firebaseSetup';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { browserSessionPersistence, createUserWithEmailAndPassword, setPersistence, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 
 export const SignIn = (email, password, router) => {
-    signInWithEmailAndPassword(auth, email, password).then( userCredential => {
+    setPersistence(auth, browserSessionPersistence).then(() => {
+        if(auth.currentUser){
+            updateDoc(doc(db, 'users', auth.currentUser.uid), {
+                status: 'offline',
+                inRoom: ''
+            })
+        }
+        return ((signInWithEmailAndPassword(auth, email, password).then( userCredential => {
         const user = userCredential.user;
         console.log(user.uid);
+        updateDoc(doc(db, 'users', user.uid), {
+            status: 'idle',
+            inRoom: ''
+        })
         router.push('/home');
     } ).catch(e => {
             console.error(e.message);
+    })))
     })
+    
 }
 export const SignUp = (email, username, password, router) => {
     createUserWithEmailAndPassword(auth, email, password).then( userCredential => {
@@ -29,7 +42,16 @@ export const SignUp = (email, username, password, router) => {
     })
 }
 
-
+export const SignOut = (router) => {
+    const earlyUser = auth.currentUser.uid
+    signOut(auth).then(()=>{
+        updateDoc(doc(db, 'users', earlyUser), {
+            status: 'offline',
+            inRoom: ''
+        })
+        router.replace('.')
+    })
+}
 
 
 export default auth;

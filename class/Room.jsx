@@ -188,6 +188,7 @@ export class Room {
 
     }
     destroy(rid, player, type="room") {
+        
         updateDoc(doc(db, 'users', player.id), {
             status: 'idle',
             inRoom: ''
