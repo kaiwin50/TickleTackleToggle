@@ -192,7 +192,6 @@ function TicTacToe(rid, player = { card: [] }, router) {
                                     turn: player.role == 'O' ? 'X' : 'O'
                                 })
                             }
-
                             break;
                         case 'Tackle':
                             if (value == (player.role == 'O' ? 'X' : 'O')) {
@@ -209,7 +208,6 @@ function TicTacToe(rid, player = { card: [] }, router) {
                                     turn: player.role == 'O' ? 'X' : 'O'
                                 })
                             }
-
                             break;
                         case 'Toggle':
                             if (value == (player.role != 'O' ? 'X' : 'O') && toggleSelect.length == 0) {

@@ -177,7 +177,7 @@ export default function CreateRoom() {
                         router.push('home');
                     }
                     else if (data.status == 'playing') {
-                        router.push(`../play/${data.inRoom}`);
+                        router.push(`/play/${data.inRoom}`);
                     }
                 })
                 onSnapshot(collection(doc(db, 'users', user.uid), 'friend'), friendsDocs => {

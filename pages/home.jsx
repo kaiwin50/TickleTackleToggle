@@ -278,7 +278,7 @@ export default function Home() {
               console.log(roomRef, players)
             }
             if (data.status == 'idle') {
-              router.push('home');
+              router.push('/home');
             }
             else if (data.status == 'playing') {
               router.push(`/play/${data.inRoom}`);

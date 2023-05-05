@@ -103,7 +103,7 @@ export default function signInPage() {
                     const data = userInfo.data();
                     console.log(data)
                     if(data.status == 'idle'){
-                      router.push('home');                    
+                      router.push('/home');                    
                     }
                     else if(data.status == 'playing'){
                       router.push(`../play/${data.inRoom}`);

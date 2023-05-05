@@ -6,7 +6,7 @@ export const SignIn = (email, password, router) => {
     signInWithEmailAndPassword(auth, email, password).then( userCredential => {
         const user = userCredential.user;
         console.log(user.uid);
-        router.push('home');
+        router.push('/home');
     } ).catch(e => {
             console.error(e.message);
     })
